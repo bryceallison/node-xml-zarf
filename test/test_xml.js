@@ -150,3 +150,41 @@ test('lists', function(t) {
     });
 });
 
+test('tree', function(t) {
+    const struct = {
+        root: {
+            name: String,
+            list: [{
+                entry: {
+                    key: String,
+                    value: String
+                }
+            }]
+        }
+    };
+
+    xmlparse.parse('test/files/tree.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    name: 'Title',
+                    list: [
+                        { 
+                            entry: {
+                                key: 'Color',
+                                value: 'blue'
+                            }
+                        },
+                        { 
+                            entry: {
+                                key: 'Size',
+                                value: 'huge'
+                            }
+                        }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
