@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first>First</first>
+  <first>First prime</first>
+  <first>First extra</first>
+  <child><name>Foo</name></child>
+  <child><name>Bar</name></child>
+</root>

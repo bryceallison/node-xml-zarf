@@ -90,3 +90,37 @@ test('twolevel', function(t) {
     });
 });
 
+test('extranode', function(t) {
+    const struct = {
+        root: {
+            first: String,
+            child: {
+                name: String
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/extranode.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, {
+                root: { 
+                    first: 'First extra',
+                    child: { name:'Bar' }
+                }
+            });
+        t.end();
+    });
+});
+
+test('marktext', function(t) {
+    const struct = {
+        root: { text: String }
+    };
+
+    xmlparse.parse('test/files/marktext.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { root: { text:'A line of text.' } });
+        t.end();
+    });
+});
+
