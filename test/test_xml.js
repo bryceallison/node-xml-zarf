@@ -254,3 +254,42 @@ test('tree', function(t) {
     });
 });
 
+test('transform', function(t) {
+    const struct = {
+        root: {
+            _accept: o => {
+                o.version = '1.0';
+            },
+            name: String,
+            static: {
+                _accept: o => 'TRUE',
+            },
+            list: [{
+                entry: {
+                    _accept: o => {
+                        return '<' + o.key + '=' + o.value.toUpperCase() + '>';
+                    },
+                    key: String,
+                    value: String
+                }
+            }]
+        }
+    };
+
+    xmlparse.parse('test/files/tree.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    name: 'Title',
+                    version: '1.0',
+                    static: 'TRUE',
+                    list: [
+                        '<Color=BLUE>',
+                        '<Size=HUGE>'
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+

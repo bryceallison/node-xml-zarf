@@ -111,6 +111,8 @@ function parse(path, struct, cb)
             return;
         context.depth -= 1;
 
+        var replace = false;
+
         var node = context.curnode;
         if (node.struct === String) {
             node.result = context.text.join('');
@@ -121,15 +123,27 @@ function parse(path, struct, cb)
             context.text = null;
         }
         else if (node.struct !== undefined) {
-            //### run _accept?
+            if (node.struct._accept !== undefined) {
+                var res = node.struct._accept(node.result);
+                if (res !== undefined) {
+                    replace = true;
+                    node.result = res;
+                }
+            }
         }
 
         context.curnode = node.parent;
 
         if (node.result !== undefined) {
             if (Array.isArray(context.curnode.result)) {
-                var obj = {};
-                obj[node.name] = node.result;
+                var obj;
+                if (!replace) {
+                    obj = {};
+                    obj[node.name] = node.result;
+                }
+                else {
+                    obj = node.result;
+                }
                 context.curnode.result.push(obj);
             }
             else if (context.curnode.result !== undefined) {
