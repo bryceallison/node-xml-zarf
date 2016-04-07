@@ -62,3 +62,31 @@ test('no structure match', function(t) {
     });
 });
 
+test('twolevel', function(t) {
+    const struct = {
+        root: {
+            head: {
+                first: String,
+                second: String,
+                notthere: String
+            },
+            body: {
+                third: String,
+                fourth: String,
+                alsonot: { }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/twolevel.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, {
+                root: { 
+                    head: { first:'First', second:'Second' },
+                    body: { third:'Third', fourth:'Fourth' }
+                }
+            });
+        t.end();
+    });
+});
+
