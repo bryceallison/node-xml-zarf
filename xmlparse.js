@@ -22,6 +22,7 @@ function parse(path, struct, cb)
         depth: 0,
         curnode: null,   // {name, attrs, struct, result}
         text: null,      // active if curnode is String
+        selferror: null, // set if we generate an error
         done: false      // set on EOF or first error
     };
 
@@ -33,6 +34,8 @@ function parse(path, struct, cb)
         context.done = true;
         /* We give up on the first error and return it. */
         context.rootresult = null;
+        if (context.selferror !== null)
+            ex = context.selferror;
         cb(null, ex);
     });
 
@@ -40,13 +43,17 @@ function parse(path, struct, cb)
         if (context.done)
             return;
         context.done = true;
+        if (context.selferror !== null) {
+            /* We generated an error. */
+            context.rootresult = null;
+            var ex = context.selferror;
+            cb(null, ex);
+        }
         /* Extract the completed doc and return it. */
-        if (context.depth != 0) {
-            console.log('### sax end: depth != 0');
-        }
-        if (context.curnode.parent !== null) {
-            console.log('### sax end: curnode.parent != null');
-        }
+        if (context.depth != 0) 
+            throw new Error('xmlparse internal error: depth not zero at end');
+        if (context.curnode.parent !== null) 
+            throw new Error('xmlparse internal error: node.parent not null at end');
         var result = context.rootresult;
         context.rootresult = null;
         cb(result, null);
@@ -80,8 +87,11 @@ function parse(path, struct, cb)
                 node.result = '';
             }
             else if (Array.isArray(match)) {
-                if (match.length != 1)
-                    throw Error('xmlparse: structure array must contain exactly one element');
+                if (match.length != 1) {
+                    context.selferror = new Error('xmlparse: structure array must contain exactly one element');
+                    parsestream.end();
+                    return;
+                }
                 node.result = [];
             }
             else if (match !== undefined) {

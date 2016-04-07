@@ -47,6 +47,20 @@ test('bad xml', function(t) {
     });
 });
 
+test('bad struct, empty array', function(t) {
+    const struct = {
+        root: {
+            list: []
+        }
+    };
+
+    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
+        t.equal(res, null, 'res is null');
+        t.assert(ex instanceof Error, 'ex instanceof Error');
+        t.end();
+    });
+});
+
 test('no structure match', function(t) {
     const struct = {
         rfoozle: {
