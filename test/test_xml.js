@@ -64,6 +64,28 @@ test('types', function(t) {
     });
 });
 
+test('selfclosed', function(t) {
+    const struct = {
+        root: {
+            name: String,
+            number: Number,
+            obj: {}
+        }
+    };
+
+    xmlparse.parse('test/files/selfclosed.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, {
+            root: {
+                name: '',
+                number: 0,
+                obj: {}
+            }
+        });
+        t.end();
+    });
+});
+
 test('bad xml', function(t) {
     const struct = {
         root: {
