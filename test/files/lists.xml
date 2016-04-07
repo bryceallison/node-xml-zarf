@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <list>
+    <int>11</int>
+    <string>Foo</string>
+    <int>22</int>
+    <string>Bar</string>
+  </list>
+</root>
