@@ -34,6 +34,36 @@ test('threestrings reverse', function(t) {
     });
 });
 
+test('types', function(t) {
+    const struct = {
+        root: {
+            'text-a': String,
+            'text-1': String,
+            'text_x': String,
+            number_a: Number,
+            number_b: Number,
+            number_c: Number,
+            number_x: Number
+        }
+    };
+
+    xmlparse.parse('test/files/types.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, {
+            root: {
+                'text-a': 'First',
+                'text-1': '123',
+                text_x: '',
+                number_a: -5,
+                number_b: 2.5,
+                number_c: 20,
+                number_x: 0
+            }
+        });
+        t.end();
+    });
+});
+
 test('bad xml', function(t) {
     const struct = {
         root: {

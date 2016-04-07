@@ -76,7 +76,7 @@ function parse(path, struct, cb)
                 struct = struct[0];
 
             var match = undefined;
-            if (struct !== String)
+            if (struct !== String && struct !== Number)
                 match = struct[tag.name];
             node.struct = match;
 
@@ -85,6 +85,12 @@ function parse(path, struct, cb)
                     console.log('### sax: re-entrant text?');
                 context.text = [];
                 node.result = '';
+            }
+            else if (match === Number) {
+                if (context.text !== null)
+                    console.log('### sax: re-entrant text?');
+                context.text = [];
+                node.result = 0;
             }
             else if (Array.isArray(match)) {
                 if (match.length != 1) {
@@ -112,6 +118,10 @@ function parse(path, struct, cb)
         var oldnode = context.curnode;
         if (oldnode.struct === String) {
             oldnode.result = context.text.join('');
+            context.text = null;
+        }
+        else if (oldnode.struct === Number) {
+            oldnode.result = 1 * context.text.join('');
             context.text = null;
         }
         else if (oldnode.struct !== undefined) {
