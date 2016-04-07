@@ -111,29 +111,29 @@ function parse(path, struct, cb)
             return;
         context.depth -= 1;
 
-        var oldnode = context.curnode;
-        if (oldnode.struct === String) {
-            oldnode.result = context.text.join('');
+        var node = context.curnode;
+        if (node.struct === String) {
+            node.result = context.text.join('');
             context.text = null;
         }
-        else if (oldnode.struct === Number) {
-            oldnode.result = 1 * context.text.join('');
+        else if (node.struct === Number) {
+            node.result = 1 * context.text.join('');
             context.text = null;
         }
-        else if (oldnode.struct !== undefined) {
+        else if (node.struct !== undefined) {
             //### run _accept?
         }
 
-        context.curnode = oldnode.parent;
+        context.curnode = node.parent;
 
-        if (oldnode.result !== undefined) {
+        if (node.result !== undefined) {
             if (Array.isArray(context.curnode.result)) {
                 var obj = {};
-                obj[oldnode.name] = oldnode.result;
+                obj[node.name] = node.result;
                 context.curnode.result.push(obj);
             }
             else if (context.curnode.result !== undefined) {
-                context.curnode.result[oldnode.name] = oldnode.result;
+                context.curnode.result[node.name] = node.result;
             }
         }
     });
