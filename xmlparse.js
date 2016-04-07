@@ -81,14 +81,10 @@ function parse(path, struct, cb)
             node.struct = match;
 
             if (match === String) {
-                if (context.text !== null)
-                    console.log('### sax: re-entrant text?');
                 context.text = [];
                 node.result = '';
             }
             else if (match === Number) {
-                if (context.text !== null)
-                    console.log('### sax: re-entrant text?');
                 context.text = [];
                 node.result = 0;
             }
