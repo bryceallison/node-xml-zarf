@@ -257,16 +257,16 @@ test('tree', function(t) {
 test('transform', function(t) {
     const struct = {
         root: {
-            _accept: o => {
+            _result: o => {
                 o.version = '1.0';
             },
             name: String,
             static: {
-                _accept: o => 'TRUE',
+                _result: o => 'TRUE',
             },
             list: [{
                 entry: {
-                    _accept: o => {
+                    _result: o => {
                         return '<' + o.key + '=' + o.value.toUpperCase() + '>';
                     },
                     key: String,

@@ -123,8 +123,8 @@ function parse(path, struct, cb)
             context.text = null;
         }
         else if (node.struct !== undefined) {
-            if (node.struct._accept !== undefined) {
-                var res = node.struct._accept(node.result);
+            if (node.struct._result !== undefined) {
+                var res = node.struct._result(node.result);
                 if (res !== undefined) {
                     replace = true;
                     node.result = res;
