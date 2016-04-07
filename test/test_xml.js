@@ -1,12 +1,7 @@
 const test = require('tape').test;
 const xmlparse = require('../xmlparse.js');
 
-test('DUMMY equality', function(t) {
-    t.equal(1, 1, 'these two numbers are equal');
-    t.end();
-});
-
-test('twostrings', function(t) {
+test('twostrings simple', function(t) {
     const struct = {
         root: {
             first: String,
@@ -14,14 +9,56 @@ test('twostrings', function(t) {
         }
     };
 
-    xmlparse.parse('test/files/twostrings.xml', struct, (res, ex) => {
+    xmlparse.parse('test/files/threestrings.xml', struct, (res, ex) => {
         t.equal(ex, null);
         t.deepEqual(res, { root: { first:'First', second:'Second' } });
         t.end();
     });
 });
 
-test('DUMMY equality 2', function(t) {
-    t.equal(2, 2, 'these two numbers are equal');
-    t.end();
+test('threestrings reverse', function(t) {
+    const struct = {
+        root: {
+            third: String,
+            second: String,
+            first: String
+        }
+    };
+
+    xmlparse.parse('test/files/threestrings.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, {
+                root: { first:'First', second:'Second', third:'Third' } 
+            });
+        t.end();
+    });
 });
+
+test('bad xml', function(t) {
+    const struct = {
+        root: {
+        }
+    };
+
+    xmlparse.parse('test/files/bad.xml', struct, (res, ex) => {
+        t.equal(res, null, 'res is null');
+        t.assert(ex instanceof Error, 'ex instanceof Error');
+        t.end();
+    });
+});
+
+test('no structure match', function(t) {
+    const struct = {
+        rfoozle: {
+            first: String,
+            second: String
+        }
+    };
+
+    xmlparse.parse('test/files/threestrings.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, {});
+        t.end();
+    });
+});
+
