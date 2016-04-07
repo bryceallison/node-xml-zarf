@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <name>Title</name>
+  <list>
+    <entry>
+      <key>Color</key>
+      <value>blue</value>
+    </entry>
+    <entry>
+      <key>Size</key>
+      <value>huge</value>
+    </entry>
+    <nomatch>Ignore</nomatch>
+  </list>
+</root>
