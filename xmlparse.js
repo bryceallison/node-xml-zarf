@@ -20,13 +20,12 @@ function parse(path, struct, cb)
     var context = {
         rootresult: {},
         depth: 0,
-        nodestack: [],   // list of parent nodes
         curnode: null,   // {name, attrs, struct, result}
         text: null,      // active if curnode is String
         done: false      // set on EOF or first error
     };
 
-    context.curnode = { struct:struct, result:context.rootresult };
+    context.curnode = { parent: null, struct:struct, result:context.rootresult };
 
     parsestream.on('error', function(ex) {
         if (context.done)
@@ -45,8 +44,8 @@ function parse(path, struct, cb)
         if (context.depth != 0) {
             console.log('### sax end: depth != 0');
         }
-        if (context.nodestack.length != 0) {
-            console.log('### sax end: nodestack.length != 0');
+        if (context.curnode.parent !== null) {
+            console.log('### sax end: curnode.parent != null');
         }
         var result = context.rootresult;
         context.rootresult = null;
@@ -84,8 +83,7 @@ function parse(path, struct, cb)
             }
         }
 
-        var node = { name:tag.name, attrs:tag.attrs, struct:match, result:initresult };
-        context.nodestack.push(context.curnode);
+        var node = { name:tag.name, attrs:tag.attrs, struct:match, result:initresult, parent:context.curnode };
         context.curnode = node;
 
         context.depth += 1;
@@ -105,7 +103,7 @@ function parse(path, struct, cb)
             //### run _accept?
         }
 
-        context.curnode = context.nodestack.pop();
+        context.curnode = oldnode.parent;
 
         if (oldnode.result !== undefined) {
             if (Array.isArray(context.curnode.result)) {
