@@ -62,19 +62,25 @@ function parse(path, struct, cb)
         var initresult = undefined;
 
         if (struct !== undefined) {
+            if (Array.isArray(struct))
+                struct = struct[0];
+
             if (struct !== String)
                 match = struct[tag.name];
+
             if (match === String) {
                 if (context.text !== null)
                     console.log('### sax: re-entrant text?');
                 context.text = [];
                 initresult = '';
             }
+            else if (Array.isArray(match)) {
+                if (match.length != 1)
+                    throw Error('xmlparse: structure array must contain exactly one element');
+                initresult = [];
+            }
             else if (match !== undefined) {
                 initresult = {};
-            }
-            else {
-                console.log('### sax: skipping tag: ' + tag.name);
             }
         }
 
@@ -102,7 +108,12 @@ function parse(path, struct, cb)
         context.curnode = context.nodestack.pop();
 
         if (oldnode.result !== undefined) {
-            if (context.curnode.result !== undefined) {
+            if (Array.isArray(context.curnode.result)) {
+                var obj = {};
+                obj[oldnode.name] = oldnode.result;
+                context.curnode.result.push(obj);
+            }
+            else if (context.curnode.result !== undefined) {
                 context.curnode.result[oldnode.name] = oldnode.result;
             }
         }

@@ -124,3 +124,29 @@ test('marktext', function(t) {
     });
 });
 
+test('lists', function(t) {
+    const struct = {
+        root: {
+            list: [{
+                int: String,
+                string: String
+            }]
+        }
+    };
+
+    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: [
+                        { int: '11' },
+                        { string: 'Foo' },
+                        { int: '22' },
+                        { string: 'Bar' }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
