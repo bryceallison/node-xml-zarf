@@ -57,33 +57,38 @@ function parse(path, struct, cb)
             return;
 
         var struct = context.curnode.struct;
-        var match = undefined;
-        var initresult = undefined;
+
+        var node = {
+            name:tag.name, attrs:tag.attrs,
+            struct:undefined, result:undefined, 
+            parent:context.curnode
+        };
 
         if (struct !== undefined) {
             if (Array.isArray(struct))
                 struct = struct[0];
 
+            var match = undefined;
             if (struct !== String)
                 match = struct[tag.name];
+            node.struct = match;
 
             if (match === String) {
                 if (context.text !== null)
                     console.log('### sax: re-entrant text?');
                 context.text = [];
-                initresult = '';
+                node.result = '';
             }
             else if (Array.isArray(match)) {
                 if (match.length != 1)
                     throw Error('xmlparse: structure array must contain exactly one element');
-                initresult = [];
+                node.result = [];
             }
             else if (match !== undefined) {
-                initresult = {};
+                node.result = {};
             }
         }
 
-        var node = { name:tag.name, attrs:tag.attrs, struct:match, result:initresult, parent:context.curnode };
         context.curnode = node;
 
         context.depth += 1;
