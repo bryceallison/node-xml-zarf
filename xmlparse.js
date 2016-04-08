@@ -65,7 +65,7 @@ const sax = require('sax');
     exactly one object (with similar fields).
 
     If you want custom classes or other post-processing, you can add an
-    _accept(o) function to any object in the template. This function can
+    _result(o) function to any object in the template. This function can
     either modify o (and return undefined), or return any Javascript value.
 */
 
