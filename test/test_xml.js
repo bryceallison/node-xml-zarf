@@ -181,7 +181,7 @@ test('lists', function(t) {
         root: {
             list: {
                 _list: Object,
-                int: String,
+                int: Number,
                 string: String
             }
         }
@@ -192,9 +192,9 @@ test('lists', function(t) {
         t.deepEqual(res, { 
                 root: { 
                     list: [
-                        { int: '11' },
+                        { int: 11 },
                         { string: 'Foo' },
-                        { int: '22' },
+                        { int: 22 },
                         { string: 'Bar' }
                     ]
                 }
@@ -360,6 +360,57 @@ test('transform', function(t) {
                         '<Color=BLUE>',
                         '<Size=HUGE>'
                     ]
+                }
+            });
+        t.end();
+    });
+});
+
+test('list-strings transform', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                name: String,
+                _result: l => { l.push('END'); }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/stringlist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    list: [
+                        'First',
+                        'Second',
+                        'Third',
+                        'Fourth',
+                        'END'
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
+test('lists transform', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                _result: ls => ls.join('/'),
+                int: String,
+                string: String
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: '11/Foo/22/Bar'
                 }
             });
         t.end();
