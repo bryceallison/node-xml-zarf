@@ -261,6 +261,32 @@ test('list-items deep', function(t) {
     });
 });
 
+test('list-strings', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                name: String,
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/stringlist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    list: [
+                        'First',
+                        'Second',
+                        'Third',
+                        'Fourth'
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
 test('tree', function(t) {
     const struct = {
         root: {

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <list>
+    <item>
+      <name>First</name>
+      <count>4</count>
+    </item>
+    <item>
+      <name>Second</name>
+    </item>
+    <item>
+      <name>Third</name>
+    </item>
+    <item>
+      <name>Fourth</name>
+    </item>
+  </list>
+</root>
