@@ -136,9 +136,6 @@ function parse(path, struct, cb)
         };
 
         if (struct !== undefined) {
-            if (Array.isArray(struct))
-                struct = struct[0];
-
             var match = undefined;
             if (struct !== String && struct !== Number)
                 match = struct[tag.name];
@@ -152,16 +149,11 @@ function parse(path, struct, cb)
                 context.text = [];
                 node.result = 0;
             }
-            else if (Array.isArray(match)) {
-                if (match.length != 1) {
-                    context.selferror = new Error('xmlparse: structure array must contain exactly one element');
-                    parsestream.end();
-                    return;
-                }
-                node.result = [];
-            }
             else if (match !== undefined) {
-                node.result = {};
+                if (match._list)
+                    node.result = [];
+                else
+                    node.result = {};
             }
         }
 
@@ -175,8 +167,6 @@ function parse(path, struct, cb)
             return;
         context.depth -= 1;
 
-        var replace = false;
-
         var node = context.curnode;
         if (node.struct === String) {
             node.result = context.text.join('');
@@ -189,19 +179,17 @@ function parse(path, struct, cb)
         else if (node.struct !== undefined) {
             if (node.struct._result !== undefined) {
                 var res = node.struct._result(node.result);
-                if (res !== undefined) {
-                    replace = true;
+                if (res !== undefined)
                     node.result = res;
-                }
             }
         }
 
         context.curnode = node.parent;
 
         if (node.result !== undefined) {
-            if (Array.isArray(context.curnode.result)) {
+            if (context.curnode.struct._list) {
                 var obj;
-                if (!replace) {
+                if (context.curnode.struct._list == Object) {
                     obj = {};
                     obj[node.name] = node.result;
                 }

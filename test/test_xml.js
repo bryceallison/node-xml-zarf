@@ -99,20 +99,6 @@ test('bad xml', function(t) {
     });
 });
 
-test('bad struct, empty array', function(t) {
-    const struct = {
-        root: {
-            list: []
-        }
-    };
-
-    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
-        t.equal(res, null, 'res is null');
-        t.assert(ex instanceof Error, 'ex instanceof Error');
-        t.end();
-    });
-});
-
 test('no structure match', function(t) {
     const struct = {
         rfoozle: {
@@ -193,10 +179,11 @@ test('marktext', function(t) {
 test('lists', function(t) {
     const struct = {
         root: {
-            list: [{
+            list: {
+                _list: Object,
                 int: String,
                 string: String
-            }]
+            }
         }
     };
 
@@ -216,16 +203,75 @@ test('lists', function(t) {
     });
 });
 
+test('list-items', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                item: {
+                    name: String,
+                    count: Number
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/itemlist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    list: [
+                        { name:'First', count:4 },
+                        { name:'Second' },
+                        { name:'Third' },
+                        { name:'Fourth' }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
+test('list-items deep', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: Object,
+                item: {
+                    name: String,
+                    count: Number
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/itemlist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    list: [
+                        { item: { name:'First', count:4 } }, 
+                        { item: { name:'Second' } },
+                        { item: { name:'Third' } },
+                        { item: { name:'Fourth' } }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
 test('tree', function(t) {
     const struct = {
         root: {
             name: String,
-            list: [{
+            list: {
+                _list: Object,
                 entry: {
                     key: String,
                     value: String
                 }
-            }]
+            }
         }
     };
 
@@ -264,7 +310,8 @@ test('transform', function(t) {
             static: {
                 _result: o => 'TRUE',
             },
-            list: [{
+            list: {
+                _list: true,
                 entry: {
                     _result: o => {
                         return '<' + o.key + '=' + o.value.toUpperCase() + '>';
@@ -272,7 +319,7 @@ test('transform', function(t) {
                     key: String,
                     value: String
                 }
-            }]
+            }
         }
     };
 
