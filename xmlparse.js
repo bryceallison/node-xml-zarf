@@ -25,9 +25,10 @@ const sax = require('sax');
             obj: { 
                 val: String
             },
-            list: [ {
+            list: {
+                _list: true,
                 val: String
-            } ]
+            }
         }
     };
 
@@ -61,8 +62,10 @@ const sax = require('sax');
     are ignored.
 
     Note that an object field in the template can be the symbol String,
-    the symbol Number, an object (with similar fields), or a list containing
-    exactly one object (with similar fields).
+    the symbol Number, or another object. The special field _list, if
+    true, means that the child tags form a JS list rather than an object.
+    If _list is the symbol Object, the child objects are de-nested by
+    one level.
 
     If you want custom classes or other post-processing, you can add an
     _result(o) function to any object in the template. This function can
