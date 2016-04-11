@@ -68,8 +68,10 @@ const sax = require('sax');
         list: [ {val:'Bar'}, {val:'Baz'} ]
 
     If you want custom classes or other post-processing, you can add an
-    _result(o) function to any object in the template. This function can
-    either modify o (and return undefined), or return any Javascript value.
+    _result(o, attr) function to any object in the template. (The attr
+    argument contains the XML attributes from the open tag.) This function
+    can either modify o (and return undefined), or return any Javascript
+    value.
 */
 
 function parse(path, struct, cb)
@@ -87,7 +89,7 @@ function parse(path, struct, cb)
     var context = {
         rootresult: {},
         depth: 0,
-        curnode: null,   // {name, attrs, struct, result}
+        curnode: null,   // {name, attr, struct, result}
         text: null,      // active if curnode is String
         selferror: null, // set if we generate an error
         done: false      // set on EOF or first error
@@ -133,7 +135,7 @@ function parse(path, struct, cb)
         var struct = context.curnode.struct;
 
         var node = {
-            name:tag.name, attrs:tag.attrs,
+            name:tag.name, attr:tag.attributes,
             struct:undefined, result:undefined, 
             parent:context.curnode
         };
@@ -181,7 +183,7 @@ function parse(path, struct, cb)
         }
         else if (node.struct !== undefined) {
             if (node.struct._result !== undefined) {
-                var res = node.struct._result(node.result);
+                var res = node.struct._result(node.result, node.attr);
                 if (res !== undefined)
                     node.result = res;
             }

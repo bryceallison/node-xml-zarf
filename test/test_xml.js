@@ -417,3 +417,42 @@ test('lists transform', function(t) {
     });
 });
 
+test('attributes', function(t) {
+    const struct = {
+        root: {
+            _result: (o, attr) => {
+                o.version = attr.version;
+            },
+            thing: String,
+            list: {
+                _list: true,
+                item: {
+                    _result: (o, attr) => {
+                        var count = 0;
+                        if (attr.count)
+                            count = 1 * attr.count;
+                        return [count, o];
+                    },
+                    name: String
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/attrs.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    version: '1.0',
+                    thing: 'A thing.',
+                    list: [
+                        [ 1, { name:'First' } ],
+                        [ 11, { name:'Second' } ],
+                        [ 0, { name:'Third' } ]
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
