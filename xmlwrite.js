@@ -18,15 +18,7 @@ function write(path, struct, doc, cb)
         return;
     }
 
-    var node = {
-        phase: PH_INIT,
-        parent: null,
-        tagname: null,
-        doc: doc,
-        struct: struct,
-        order: null,
-        index: null
-    };
+    var node = new TagNode(null, struct, doc, null);
 
     var context = {
         stream: writestream,
@@ -38,6 +30,17 @@ function write(path, struct, doc, cb)
     context.outbuf.push('<?xml version="1.0" encoding="UTF-8"?>\n');
 
     thunk(context);
+}
+
+function TagNode(tagname, struct, doc, parent)
+{
+    this.phase = PH_INIT;
+    this.parent = parent;
+    this.tagname = tagname;
+    this.doc = doc;
+    this.struct = struct;
+    this.order = null;
+    this.index = null;
 }
 
 function thunk(context)
@@ -97,15 +100,8 @@ function thunk(context)
             var subdoc = node.doc[tag];
             if (subdoc === undefined)
                 continue;
-            
-            var newnode = {
-                phase: PH_INIT,
-                parent: node,
-                tagname: tag,
-                doc: subdoc,
-                struct: substruct,
-                index: null
-            };
+
+            var newnode = new TagNode(tag, substruct, subdoc, node);
             context.node = newnode;
             continue;
         }
