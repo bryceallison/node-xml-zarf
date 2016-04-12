@@ -2,6 +2,10 @@
 
 const fs = require('fs');
 
+const PH_INIT = 0;
+const PH_CHILDREN = 1;
+const PH_FINAL = 2;
+
 function write(path, struct, doc, cb)
 {
     var writestream = null;
@@ -15,6 +19,7 @@ function write(path, struct, doc, cb)
     }
 
     var node = {
+        phase: PH_INIT,
         parent: null,
         tagname: null,
         doc: doc,
@@ -52,7 +57,7 @@ function thunk(context)
             return;
         }
 
-        if (node.index === null) {
+        if (node.phase == PH_INIT) {
             if (node.struct._order !== undefined) {
                 node.order = node.struct._order;
             }
@@ -64,38 +69,46 @@ function thunk(context)
                 }
             }
 
+            node.phase++;
             node.index = 0;
             context.outbuf.push('### enter ' + node.tagname + '\n');
-            context.outbuf.push('### ...node.order ' + node.order + '\n');
             continue;
         }
 
-        if (node.index !== null && node.index >= node.order.length) {
+        if (node.phase == PH_FINAL) {
             context.outbuf.push('### exit ' + node.tagname + '\n');
             context.node = node.parent;
             continue;
         }
 
-        var tag = node.order[node.index];
-        node.index += 1;
-        context.outbuf.push('### ...trying tag ' + tag + '\n');
+        if (node.phase == PH_CHILDREN) {
+            if (node.index >= node.order.length) {
+                node.phase++;
+                continue;
+            }
 
-        var substruct = node.struct[tag];
-        if (substruct === undefined)
+            var tag = node.order[node.index];
+            node.index += 1;
+            context.outbuf.push('### ...trying tag ' + tag + '\n');
+            
+            var substruct = node.struct[tag];
+            if (substruct === undefined)
+                continue;
+            var subdoc = node.doc[tag];
+            if (subdoc === undefined)
+                continue;
+            
+            var newnode = {
+                phase: PH_INIT,
+                parent: node,
+                tagname: tag,
+                doc: subdoc,
+                struct: substruct,
+                index: null
+            };
+            context.node = newnode;
             continue;
-        var subdoc = node.doc[tag];
-        if (subdoc === undefined)
-            continue;
-        
-        var newnode = {
-            parent: node,
-            tagname: tag,
-            doc: subdoc,
-            struct: substruct,
-            index: null
-        };
-        context.node = newnode;
-        continue;
+        }
     }
 }
 
