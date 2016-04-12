@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root version="1.0">
+  <thing foo="footext" bar="bartext">A thing.</thing>
+  <list>
+    <item count="1">
+      <name>First</name>
+    </item>
+    <item count="11" noncount="y">
+      <name>Second</name>
+    </item>
+    <item>
+      <name>Third</name>
+    </item>
+  </list>
+</root>
