@@ -28,8 +28,6 @@ function write(path, struct, doc, cb)
         outbuf: []
     };
 
-    context.outbuf.push('<?xml version="1.0" encoding="UTF-8"?>\n');
-
     thunk(context);
 }
 
@@ -48,7 +46,7 @@ function thunk(context)
 {
     while (true) {
         if (context.outbuf.length) {
-            var text = context.outbuf.pop();
+            var text = context.outbuf.shift();
             var more = context.stream.write(text);
             if (!more)
                 context.stream.once('drain', thunk);
@@ -105,7 +103,19 @@ function thunk(context)
         }
 
         if (node.phase == PH_OPEN) {
-            context.outbuf.push('### enter ' + node.tagname + ', ' + node.children.length + ' children' + '\n');
+            if (node.tagname === null) {
+                context.outbuf.push('<?xml version="1.0" encoding="UTF-8"?>\n');
+            }
+            else {
+                context.outbuf.push('<', node.tagname);
+                
+                if (!node.children || !node.children.length) {
+                    context.outbuf.push('/>\n');
+                }
+                else {
+                    context.outbuf.push('>\n');
+                }
+            }
 
             node.index = 0;
             node.phase++;
@@ -113,21 +123,31 @@ function thunk(context)
         }
 
         if (node.phase == PH_CHILDREN) {
-            if (node.index >= node.children.length) {
+            if (!node.children || node.index >= node.children.length) {
                 node.phase++;
                 continue;
             }
 
             var newnode = node.children[node.index];
             node.index += 1;
-            context.outbuf.push('### ...trying tag ' + newnode.tagname + '\n');
             
             context.node = newnode;
             continue;
         }
 
         if (node.phase == PH_FINAL) {
-            context.outbuf.push('### exit ' + node.tagname + '\n');
+            if (node.tagname === null) {
+                // pass
+            }
+            else {
+                if (!node.children || !node.children.length) {
+                    // pass
+                }
+                else {
+                    context.outbuf.push('</', node.tagname, '>\n');
+                }
+            }
+
             context.node = node.parent;
             continue;
         }
