@@ -60,7 +60,10 @@ function thunk(context)
         }
 
         if (node.phase == PH_INIT) {
-            if (node.struct._list !== undefined) {
+            if (node.struct === String) {
+                node.children = [ node.doc ];
+            }
+            else if (node.struct._list !== undefined) {
                 var tag = node.struct._list;
                 var substruct = node.struct[tag];
                 node.children = [];
@@ -110,10 +113,14 @@ function thunk(context)
                 context.outbuf.push('<', node.tagname);
                 
                 if (!node.children || !node.children.length) {
-                    context.outbuf.push('/>\n');
+                    context.outbuf.push('/>');
                 }
                 else {
-                    context.outbuf.push('>\n');
+                    context.outbuf.push('>');
+                }
+
+                if (node.struct !== String) {
+                    context.outbuf.push('\n');
                 }
             }
 
@@ -130,6 +137,11 @@ function thunk(context)
 
             var newnode = node.children[node.index];
             node.index += 1;
+
+            if (node.struct === String) {
+                context.outbuf.push(newnode); //### escape
+                continue;
+            }
             
             context.node = newnode;
             continue;
