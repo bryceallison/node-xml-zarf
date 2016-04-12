@@ -25,6 +25,8 @@ function write(path, struct, doc, cb)
         stream: writestream,
         callback: cb,
         node: node,
+        depth: 0,
+        indent: true, //###
         outbuf: []
     };
 
@@ -110,6 +112,11 @@ function thunk(context)
                 context.outbuf.push('<?xml version="1.0" encoding="UTF-8"?>\n');
             }
             else {
+                if (context.indent) {
+                    for (var ix=0; ix<context.depth; ix++)
+                        context.outbuf.push('  ');
+                }
+                    
                 context.outbuf.push('<', node.tagname);
                 
                 if (!node.children || !node.children.length) {
@@ -144,6 +151,7 @@ function thunk(context)
             }
             
             context.node = newnode;
+            context.depth++;
             continue;
         }
 
@@ -156,11 +164,18 @@ function thunk(context)
                     // pass
                 }
                 else {
+                    if (node.struct !== String) {
+                        if (context.indent) {
+                            for (var ix=0; ix<context.depth; ix++)
+                                context.outbuf.push('  ');
+                        }
+                    }
                     context.outbuf.push('</', node.tagname, '>\n');
                 }
             }
 
             context.node = node.parent;
+            context.depth--;
             continue;
         }
 
