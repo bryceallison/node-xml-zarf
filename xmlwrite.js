@@ -61,30 +61,42 @@ function thunk(context)
         }
 
         if (node.phase == PH_INIT) {
-            var order;
-            if (node.struct._order !== undefined) {
-                order = node.struct._order;
-            }
-            else {
-                order = [];
-                for (var key in node.struct) {
-                    if (!key.startsWith('_'))
-                        order.push(key);
+            if (node.struct._list !== undefined) {
+                var tag = node.struct._list;
+                var substruct = node.struct[tag];
+                node.children = [];
+                for (var ix=0; ix<node.doc.length; ix++) {
+                    var subdoc = node.doc[ix];
+                    var newnode = new TagNode(tag, substruct, subdoc, node);
+                    node.children.push(newnode);
                 }
             }
-
-            node.children = [];
-            for (var ix=0; ix<order.length; ix++) {
-                var tag = order[ix];
-                var substruct = node.struct[tag];
-                if (substruct === undefined)
-                    continue;
-                var subdoc = node.doc[tag];
-                if (subdoc === undefined)
-                    continue;
+            else { 
+                var order;
+                if (node.struct._order !== undefined) {
+                    order = node.struct._order;
+                }
+                else {
+                    order = [];
+                    for (var key in node.struct) {
+                        if (!key.startsWith('_'))
+                            order.push(key);
+                    }
+                }
                 
-                var newnode = new TagNode(tag, substruct, subdoc, node);
-                node.children.push(newnode);
+                node.children = [];
+                for (var ix=0; ix<order.length; ix++) {
+                    var tag = order[ix];
+                    var substruct = node.struct[tag];
+                    if (substruct === undefined)
+                        continue;
+                    var subdoc = node.doc[tag];
+                    if (subdoc === undefined)
+                        continue;
+                    
+                    var newnode = new TagNode(tag, substruct, subdoc, node);
+                    node.children.push(newnode);
+                }
             }
 
             node.index = 0;
@@ -108,7 +120,7 @@ function thunk(context)
 
             var newnode = node.children[node.index];
             node.index += 1;
-            context.outbuf.push('### ...trying tag ' + newnode.tag + '\n');
+            context.outbuf.push('### ...trying tag ' + newnode.tagname + '\n');
             
             context.node = newnode;
             continue;
