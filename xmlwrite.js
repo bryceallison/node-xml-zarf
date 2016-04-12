@@ -39,7 +39,7 @@ function TagNode(tagname, struct, doc, parent)
     this.tagname = tagname;
     this.doc = doc;
     this.struct = struct;
-    this.order = null;
+    this.children = null;
     this.index = null;
 }
 
@@ -61,20 +61,36 @@ function thunk(context)
         }
 
         if (node.phase == PH_INIT) {
+            var order;
             if (node.struct._order !== undefined) {
-                node.order = node.struct._order;
+                order = node.struct._order;
             }
             else {
-                node.order = [];
+                order = [];
                 for (var key in node.struct) {
                     if (!key.startsWith('_'))
-                        node.order.push(key);
+                        order.push(key);
                 }
             }
 
-            node.phase++;
+            node.children = [];
+            for (var ix=0; ix<order.length; ix++) {
+                var tag = order[ix];
+                var substruct = node.struct[tag];
+                if (substruct === undefined)
+                    continue;
+                var subdoc = node.doc[tag];
+                if (subdoc === undefined)
+                    continue;
+                
+                var newnode = new TagNode(tag, substruct, subdoc, node);
+                node.children.push(newnode);
+            }
+
             node.index = 0;
-            context.outbuf.push('### enter ' + node.tagname + '\n');
+            context.outbuf.push('### enter ' + node.tagname + ', ' + node.children.length + ' children' + '\n');
+
+            node.phase++;
             continue;
         }
 
@@ -85,23 +101,15 @@ function thunk(context)
         }
 
         if (node.phase == PH_CHILDREN) {
-            if (node.index >= node.order.length) {
+            if (node.index >= node.children.length) {
                 node.phase++;
                 continue;
             }
 
-            var tag = node.order[node.index];
+            var newnode = node.children[node.index];
             node.index += 1;
-            context.outbuf.push('### ...trying tag ' + tag + '\n');
+            context.outbuf.push('### ...trying tag ' + newnode.tag + '\n');
             
-            var substruct = node.struct[tag];
-            if (substruct === undefined)
-                continue;
-            var subdoc = node.doc[tag];
-            if (subdoc === undefined)
-                continue;
-
-            var newnode = new TagNode(tag, substruct, subdoc, node);
             context.node = newnode;
             continue;
         }
