@@ -3,8 +3,9 @@
 const fs = require('fs');
 
 const PH_INIT = 0;
-const PH_CHILDREN = 1;
-const PH_FINAL = 2;
+const PH_OPEN = 1;
+const PH_CHILDREN = 2;
+const PH_FINAL = 3;
 
 function write(path, struct, doc, cb)
 {
@@ -99,16 +100,15 @@ function thunk(context)
                 }
             }
 
-            node.index = 0;
-            context.outbuf.push('### enter ' + node.tagname + ', ' + node.children.length + ' children' + '\n');
-
             node.phase++;
             continue;
         }
 
-        if (node.phase == PH_FINAL) {
-            context.outbuf.push('### exit ' + node.tagname + '\n');
-            context.node = node.parent;
+        if (node.phase == PH_OPEN) {
+            context.outbuf.push('### enter ' + node.tagname + ', ' + node.children.length + ' children' + '\n');
+
+            node.index = 0;
+            node.phase++;
             continue;
         }
 
@@ -125,6 +125,13 @@ function thunk(context)
             context.node = newnode;
             continue;
         }
+
+        if (node.phase == PH_FINAL) {
+            context.outbuf.push('### exit ' + node.tagname + '\n');
+            context.node = node.parent;
+            continue;
+        }
+
     }
 }
 
