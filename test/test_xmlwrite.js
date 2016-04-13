@@ -64,3 +64,49 @@ test('twostrings simple', function(t) {
     });
 });
 
+test('listitems', function(t) {
+    const struct = {
+        root: {
+            variables: {
+                _list: 'variable',
+                variable: {
+                    _order: [ 'name', 'type' ],
+                    name: String,
+                    type: String
+                }
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            variables: [
+                { name: 'count', type: 'int' },
+                { name: 'size', type: 'float' }
+            ]
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <variables>
+      <variable>
+        <name>count</name>
+        <type>int</type>
+      </variable>
+      <variable>
+        <name>size</name>
+        <type>float</type>
+      </variable>
+    </variables>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
