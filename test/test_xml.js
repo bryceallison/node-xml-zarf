@@ -1,5 +1,32 @@
+const stream_mod = require('stream');
+const buffer_mod = require('buffer');
+
 const test = require('tape').test;
 const xmlparse = require('../xmlparse.js');
+
+function ReadStringBuffer(str)
+{
+    var buffer = new buffer_mod.Buffer(str);
+    var consumed = false;
+
+    var stream = new stream_mod.Readable({
+            read: function(size) {
+                while (true) {
+                    if (!consumed) {
+                        var more = this.push(buffer);
+                        consumed = true;
+                        if (!more)
+                            return;
+                        continue;
+                    }
+                    this.push(null);
+                    return;
+                }
+            }
+        });
+
+    return stream;
+}
 
 test('twostrings simple', function(t) {
     const struct = {
@@ -10,6 +37,30 @@ test('twostrings simple', function(t) {
     };
 
     xmlparse.parse('test/files/threestrings.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { root: { first:'First', second:'Second' } });
+        t.end();
+    });
+});
+
+test('twostrings streamed', function(t) {
+    const struct = {
+        root: {
+            first: String,
+            second: String
+        }
+    };
+
+    const doc = `<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first>First</first>
+  <second>Second</second>
+  <third>Third</third>
+</root>
+`;
+
+    var readstream = ReadStringBuffer(doc);
+    xmlparse.parse(readstream, struct, (res, ex) => {
         t.equal(ex, null);
         t.deepEqual(res, { root: { first:'First', second:'Second' } });
         t.end();

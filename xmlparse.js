@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const stream_mod = require('stream');
 const sax = require('sax');
 
 /* xmlparse: structured XML parsing
@@ -216,7 +217,12 @@ function parse(path, struct, cb)
             context.text.push(val);
     });
 
-    var pipe = fs.createReadStream(path).pipe(parsestream);
+    var readstream = null;
+    if (path instanceof stream_mod.Readable)
+        readstream = path;
+    else
+        readstream = fs.createReadStream(path);
+    var pipe = readstream.pipe(parsestream);
 }
 
 exports.parse = parse;
