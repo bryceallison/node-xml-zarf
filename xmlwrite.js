@@ -50,6 +50,17 @@ function TagNode(tagname, struct, doc, parent)
     this.index = null;
 }
 
+function escape_xml_text(str)
+{
+    var match = str.match(/[><&]/);
+    if (match == null)
+        return str;
+    str = str.replace('&', '&amp;');
+    str = str.replace('<', '&lt;');
+    str = str.replace('>', '&gt;');
+    return str;
+}
+
 function thunk(context)
 {
     while (true) {
@@ -160,7 +171,8 @@ function thunk(context)
 
             if (node.struct === String || typeof(newnode) == 'string') {
                 //### maybe typecheck for string nodes?
-                context.outbuf.push(newnode); //### escape
+                var text = escape_xml_text(newnode);
+                context.outbuf.push(text);
                 continue;
             }
             
