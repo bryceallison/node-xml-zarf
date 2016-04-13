@@ -65,6 +65,37 @@ test('twostrings simple', function(t) {
     });
 });
 
+test('twostrings fancy', function(t) {
+    const struct = {
+        root: {
+            _order: [ 'first', 'second' ],
+            first: String,
+            second: String
+        }
+    };
+
+    const doc = {
+        root: {
+            first: '<em>Foo&amp;',
+            second: 'A\u00E5/\u03A3/\u201C\u201D.'
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <first>&lt;em&gt;Foo&amp;amp;</first>
+    <second>A\u00E5/\u03A3/\u201C\u201D.</second>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
 test('threestrings reorder', function(t) {
     const struct = {
         root: {

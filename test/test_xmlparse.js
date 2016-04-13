@@ -43,6 +43,21 @@ test('twostrings simple', function(t) {
     });
 });
 
+test('twostrings fancy', function(t) {
+    const struct = {
+        root: {
+            first: String,
+            second: String
+        }
+    };
+
+    xmlparse.parse('test/files/stringsfancy.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { root: { first:'<em>Foo&amp;', second:'A\u00E5/\u03A3/\u201C\u201D.' } });
+        t.end();
+    });
+});
+
 test('twostrings streamed', function(t) {
     const struct = {
         root: {
