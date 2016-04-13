@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const stream_mod = require('stream');
 
 const PH_INIT = 0;
 const PH_OPEN = 1;
@@ -11,12 +12,17 @@ function write(path, struct, doc, cb)
 {
     var writestream = null;
 
-    try {
-        writestream = fs.createWriteStream(path, { autoClose:true });
+    if (path instanceof stream_mod.Writable) {
+        writestream = path;
     }
-    catch (ex) {
-        cb(ex);
-        return;
+    else {
+        try {
+            writestream = fs.createWriteStream(path, { autoClose:true });
+        }
+        catch (ex) {
+            cb(ex);
+            return;
+        }
     }
 
     var node = new TagNode(null, struct, doc, null);
