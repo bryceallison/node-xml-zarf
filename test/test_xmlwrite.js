@@ -37,6 +37,7 @@ function stripwhite(str)
 test('twostrings simple', function(t) {
     const struct = {
         root: {
+            _order: [ 'first', 'second' ],
             first: String,
             second: String
         }
@@ -53,6 +54,40 @@ test('twostrings simple', function(t) {
   <root>
     <first>Hello</first>
     <second>There</second>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
+test('threestrings reorder', function(t) {
+    const struct = {
+        root: {
+            _order: [ 'first', 'second', 'third' ],
+            third: String,
+            second: String,
+            first: String
+        }
+    };
+
+    const doc = {
+        root: {
+            third: '33',
+            first: '11',
+            second: '22'
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <first>11</first>
+    <second>22</second>
+    <third>33</third>
   </root>
 `;
 
