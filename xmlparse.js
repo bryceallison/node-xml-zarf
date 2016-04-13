@@ -12,8 +12,9 @@ const sax = require('sax');
    
    To use this:
 
-   parse(pathname, struct, callback);
+   parse(source, struct, callback);
 
+   The source may be a pathname or an instance of stream.Readable.
    The call is always async, and the callback has the form
    callback(doc, err) where err is null on success.
 
