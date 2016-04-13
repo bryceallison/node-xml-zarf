@@ -145,3 +145,34 @@ test('listitems', function(t) {
     });
 });
 
+test('obj to string', function(t) {
+    const struct = {
+        root: {
+            _order: [ 'str', 'arr' ],
+            str: o => o+'!',
+            arr: o => o.join('/')
+        }
+    };
+
+    const doc = {
+        root: {
+            str: 'Hello',
+            arr: [ 'xx', 'yy', 'zz' ]
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <str>Hello!</str>
+    <arr>xx/yy/zz</arr>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+

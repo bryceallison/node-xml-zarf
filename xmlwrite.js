@@ -71,6 +71,13 @@ function thunk(context)
             if (node.struct === String) {
                 node.children = [ node.doc ];
             }
+            else if (typeof(node.struct) == 'function') {
+                var res = node.struct.call(node, node.doc);
+                if (typeof(res) == 'string') {
+                    node.children = [ res ];
+                }
+                //### else...
+            }
             else if (node.struct._list !== undefined) {
                 var tag = node.struct._list;
                 var substruct = node.struct[tag];
@@ -151,7 +158,8 @@ function thunk(context)
             var newnode = node.children[node.index];
             node.index += 1;
 
-            if (node.struct === String) {
+            if (node.struct === String || typeof(newnode) == 'string') {
+                //### maybe typecheck for string nodes?
                 context.outbuf.push(newnode); //### escape
                 continue;
             }
