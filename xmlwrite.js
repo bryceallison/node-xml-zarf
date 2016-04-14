@@ -52,9 +52,13 @@ function TagNode(tagname, struct, doc, parent)
 
 function escape_xml_text(str)
 {
+    if (typeof(str) != 'string')
+        str = '' + str;
+
     var match = str.match(/[><&]/);
     if (match == null)
         return str;
+
     str = str.replace('&', '&amp;');
     str = str.replace('<', '&lt;');
     str = str.replace('>', '&gt;');
