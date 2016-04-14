@@ -245,3 +245,61 @@ test('liststrings', function(t) {
     });
 });
 
+test('listitems partial', function(t) {
+    const struct = {
+        root: {
+            variables: {
+                _list: 'variable',
+                variable: {
+                    _order: [ 'name', 'values' ],
+                    name: String,
+                    values: {
+                        _list: 'value',
+                        value: String
+                    }
+                }
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            variables: [
+                { name: 'count', values: ['one', 'two'] },
+                { name: 'size' },
+                { values: ['xx', 'yy'] },
+            ]
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <variables>
+      <variable>
+        <name>count</name>
+        <values>
+          <value>one</value>
+          <value>two</value>
+        </values>
+      </variable>
+      <variable>
+        <name>size</name>
+      </variable>
+      <variable>
+        <values>
+          <value>xx</value>
+          <value>yy</value>
+        </values>
+      </variable>
+    </variables>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
