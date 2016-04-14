@@ -207,3 +207,41 @@ test('obj to string', function(t) {
     });
 });
 
+test('liststrings', function(t) {
+    const struct = {
+        root: {
+            variables: {
+                _list: 'variable',
+                variable: String
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            variables: [
+                'count',
+                'size',
+                'weight'
+            ]
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <variables>
+      <variable>count</variable>
+      <variable>size</variable>
+      <variable>weight</variable>
+    </variables>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
