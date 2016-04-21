@@ -48,6 +48,21 @@ function TagNode(tagname, struct, doc, parent)
     this.struct = struct;
     this.children = null;
     this.index = null;
+    this.tag = (tagname => new UserTag(tagname));
+}
+
+function UserTag(tagname, arr)
+{
+    if (Array.isArray(tagname)) {
+        arr = tagname;
+        tagname = undefined;
+    }
+    if (typeof(arr) == 'string') {
+        arr = [ arr ];
+    }
+
+    this.tagname = tagname;
+    this.arr = arr;
 }
 
 function escape_xml_text(str)
@@ -91,7 +106,12 @@ function thunk(context)
                 if (typeof(res) == 'string') {
                     node.children = [ res ];
                 }
-                //### else...
+                else if (res instanceof UserTag) {
+                    if (res.tagname)
+                        node.tagname = res.tagname;
+                    if (res.children)
+                        node.children = res.children;
+                }
             }
             else if (node.struct._list !== undefined) {
                 var tag = node.struct._list;
