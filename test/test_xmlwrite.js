@@ -316,7 +316,7 @@ test('tag creation', function(t) {
             zeroth: (val, node) => node.tag(),
             first: (val, node) => node.tag('first'),
             second: (val, node) => node.tag('altsecond'),
-            third: (val, node) => node.tag('third', [node.tag('x3a'), node.tag('x3b')]),
+            third: (val, node) => node.tag('third', [node.tag('x3a'), node.tag('x3b', ['xxyy'])]),
             fourth: (val, node) => node.tag('fourthtag', val),
         }
     };
@@ -338,7 +338,7 @@ test('tag creation', function(t) {
     <altsecond/>
     <third>
       <x3a/>
-      <x3b/>
+      <x3b>xxyy</x3b>
     </third>
     <fourthtag>fourthtext</fourthtag>
   </root>
