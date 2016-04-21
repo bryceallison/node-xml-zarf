@@ -87,7 +87,7 @@ function thunk(context)
                 node.children = [ node.doc ];
             }
             else if (typeof(node.struct) == 'function') {
-                var res = node.struct.call(node, node.doc);
+                var res = node.struct(node.doc, node);
                 if (typeof(res) == 'string') {
                     node.children = [ res ];
                 }
@@ -136,7 +136,7 @@ function thunk(context)
         }
 
         if (node.phase == PH_OPEN) {
-            if (node.tagname === null) {
+            if (context.depth == 0) {
                 context.outbuf.push('<?xml version="1.0" encoding="UTF-8"?>\n');
             }
             else {
@@ -186,7 +186,7 @@ function thunk(context)
         }
 
         if (node.phase == PH_FINAL) {
-            if (node.tagname === null) {
+            if (context.depth == 0) {
                 // pass
             }
             else {
