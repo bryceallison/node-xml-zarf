@@ -318,6 +318,7 @@ test('tag creation', function(t) {
             second: (val, node) => node.tag('altsecond'),
             third: (val, node) => node.tag('third', [node.tag('x3a'), node.tag('x3b', ['xxyy'])]),
             fourth: (val, node) => node.tag('fourthtag', val),
+            nonexist: (val, node) => node.tag(),
         }
     };
 
