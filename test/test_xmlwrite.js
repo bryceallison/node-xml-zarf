@@ -353,3 +353,45 @@ test('tag creation', function(t) {
     });
 });
 
+test('tag nullability', function(t) {
+    const struct = {
+        root: {
+            _order: [ 
+                'zeroth', 'variables',
+            ],
+            zeroth: (val, node) => null,
+            variables: {
+                _list: 'variable',
+                variable: (val, node) => {
+                    if (val == 'two')
+                        return null;
+                    return node.tag('var', val);
+                }
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            zeroth: true,
+            variables: ['one', 'two', 'three'],
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <variables>
+      <var>one</var>
+      <var>three</var>
+    </variables>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
