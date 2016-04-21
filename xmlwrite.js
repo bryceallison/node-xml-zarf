@@ -204,7 +204,7 @@ function thunk(context)
                     context.outbuf.push('>');
                 }
 
-                if (node.struct !== String) {
+                if (!(node.struct === String || typeof(node.struct) == 'string')) {
                     context.outbuf.push('\n');
                 }
             }
@@ -246,7 +246,7 @@ function thunk(context)
                     // pass
                 }
                 else {
-                    if (node.struct !== String) {
+                    if (!(node.struct === String || typeof(node.struct) == 'string')) {
                         if (context.indent) {
                             for (var ix=0; ix<context.depth; ix++)
                                 context.outbuf.push('  ');
