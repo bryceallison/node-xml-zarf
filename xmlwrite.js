@@ -117,7 +117,11 @@ function thunk(context)
                     node.children = [];
                     for (var ix=0; ix<struct.children.length; ix++) {
                         var child = struct.children[ix];
-                        var newnode = new TagNode(undefined, child, '###', node);
+                        var newnode;
+                        if (typeof(child) == 'string')
+                            newnode = child;
+                        else
+                            newnode = new TagNode('#noname#', child, '#nodoc#', node);
                         node.children.push(newnode);
                     }
                 }
@@ -203,7 +207,6 @@ function thunk(context)
             node.index += 1;
 
             if (node.struct === String || typeof(newnode) == 'string') {
-                //### maybe typecheck for string nodes?
                 var text = escape_xml_text(newnode);
                 context.outbuf.push(text);
                 continue;
