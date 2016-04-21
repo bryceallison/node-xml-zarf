@@ -46,23 +46,24 @@ function TagNode(tagname, struct, doc, parent)
     this.tagname = tagname;
     this.doc = doc;
     this.struct = struct;
+    this.origstruct = struct;
     this.children = null;
     this.index = null;
-    this.tag = (tagname => new UserTag(tagname));
+    this.tag = ((tagname, children) => new UserTag(tagname, children));
 }
 
-function UserTag(tagname, arr)
+function UserTag(tagname, children)
 {
     if (Array.isArray(tagname)) {
-        arr = tagname;
+        children = tagname;
         tagname = undefined;
     }
-    if (typeof(arr) == 'string') {
-        arr = [ arr ];
+    if (typeof(children) == 'string') {
+        children = [ children ];
     }
 
     this.tagname = tagname;
-    this.arr = arr;
+    this.children = children;
 }
 
 function escape_xml_text(str)
@@ -98,24 +99,32 @@ function thunk(context)
         }
 
         if (node.phase == PH_INIT) {
-            if (node.struct === String) {
+            if (typeof(node.struct) == 'function') {
+                node.struct = node.struct(node.doc, node);
+            }
+
+            var struct = node.struct;
+            if (struct === String) {
                 node.children = [ node.doc ];
             }
-            else if (typeof(node.struct) == 'function') {
-                var res = node.struct(node.doc, node);
-                if (typeof(res) == 'string') {
-                    node.children = [ res ];
-                }
-                else if (res instanceof UserTag) {
-                    if (res.tagname)
-                        node.tagname = res.tagname;
-                    if (res.children)
-                        node.children = res.children;
+            else if (typeof(struct) == 'string') {
+                node.children = [ struct ];
+            }
+            else if (struct instanceof UserTag) {
+                if (struct.tagname)
+                    node.tagname = struct.tagname;
+                if (struct.children) {
+                    node.children = [];
+                    for (var ix=0; ix<struct.children.length; ix++) {
+                        var child = struct.children[ix];
+                        var newnode = new TagNode(undefined, child, '###', node);
+                        node.children.push(newnode);
+                    }
                 }
             }
-            else if (node.struct._list !== undefined) {
-                var tag = node.struct._list;
-                var substruct = node.struct[tag];
+            else if (struct._list !== undefined) {
+                var tag = struct._list;
+                var substruct = struct[tag];
                 node.children = [];
                 for (var ix=0; ix<node.doc.length; ix++) {
                     var subdoc = node.doc[ix];
@@ -125,12 +134,12 @@ function thunk(context)
             }
             else { 
                 var order;
-                if (node.struct._order !== undefined) {
-                    order = node.struct._order;
+                if (struct._order !== undefined) {
+                    order = struct._order;
                 }
                 else {
                     order = [];
-                    for (var key in node.struct) {
+                    for (var key in struct) {
                         if (!key.startsWith('_'))
                             order.push(key);
                     }
@@ -139,7 +148,7 @@ function thunk(context)
                 node.children = [];
                 for (var ix=0; ix<order.length; ix++) {
                     var tag = order[ix];
-                    var substruct = node.struct[tag];
+                    var substruct = struct[tag];
                     if (substruct === undefined)
                         continue;
                     var subdoc = node.doc[tag];
