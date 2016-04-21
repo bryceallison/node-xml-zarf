@@ -306,3 +306,49 @@ test('listitems partial', function(t) {
     });
 });
 
+test('tag creation', function(t) {
+    const struct = {
+        root: {
+            _order: [ 
+                'zeroth', 'first', 'second',
+                'third', 'fourth',
+            ],
+            zeroth: (val, node) => node.tag(),
+            first: (val, node) => node.tag('first'),
+            second: (val, node) => node.tag('altsecond'),
+            third: (val, node) => node.tag('third', [node.tag('x3a'), node.tag('x3b')]),
+            fourth: (val, node) => node.tag('fourthtag', val),
+        }
+    };
+
+    const doc = {
+        root: {
+            zeroth: true,
+            first: 'Hello',
+            second: 'There',
+            third: true,
+            fourth: 'fourthtext',
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <zeroth/>
+    <first/>
+    <altsecond/>
+    <third>
+      <x3a/>
+      <x3b/>
+    </third>
+    <fourthtag>fourthtext</fourthtag>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
