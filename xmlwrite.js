@@ -104,7 +104,10 @@ function thunk(context)
             }
 
             var struct = node.struct;
-            if (struct === String) {
+            if (struct === null) {
+                // pass
+            }
+            else if (struct === String) {
                 node.children = [ node.doc ];
             }
             else if (typeof(struct) == 'string') {
@@ -172,6 +175,9 @@ function thunk(context)
             if (context.depth == 0) {
                 context.outbuf.push('<?xml version="1.0" encoding="UTF-8"?>\n');
             }
+            else if (node.struct === null) {
+                // pass
+            }
             else {
                 if (context.indent) {
                     for (var ix=0; ix<context.depth; ix++)
@@ -219,6 +225,9 @@ function thunk(context)
 
         if (node.phase == PH_FINAL) {
             if (context.depth == 0) {
+                // pass
+            }
+            else if (node.struct === null) {
                 // pass
             }
             else {
