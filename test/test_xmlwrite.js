@@ -395,3 +395,26 @@ test('tag nullability', function(t) {
     });
 });
 
+test('error on undefined', function(t) {
+    const struct = {
+        root: {
+            _order: [ 
+                'zeroth',
+            ],
+            zeroth: (val, node) => undefined,
+        }
+    };
+
+    const doc = {
+        root: {
+            zeroth: true,
+        }
+    };
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.assert(ex instanceof Error, 'ex instanceof Error');
+        t.end();
+    });
+});
+

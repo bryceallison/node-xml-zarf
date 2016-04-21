@@ -29,7 +29,13 @@ function write(path, struct, doc, cb)
 
     var context = {
         stream: writestream,
-        callback: cb,
+        callback: function(err) {
+            if (context.done)
+                return;
+            context.done = true;
+            cb(err);
+        },
+        done: false,
         node: node,
         depth: 0,
         indent: true, //###
@@ -106,6 +112,11 @@ function thunk(context)
             var struct = node.struct;
             if (struct === null) {
                 // pass
+            }
+            else if (struct === undefined) {
+                var err = new Error('xmlwrite: struct function returned undefined');
+                context.callback(err);
+                return;
             }
             else if (struct === String) {
                 node.children = [ node.doc ];
