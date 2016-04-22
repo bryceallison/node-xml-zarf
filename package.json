@@ -10,6 +10,9 @@
     "type": "git",
     "url": "https://github.com/erkyrath/node-xml-zarf.git"
   },
+  "keywords": [
+    "xml"
+  ],
   "author": "Andrew Plotkin <erkyrath@eblong.com>",
   "license": "MIT",
   "dependencies": {
