@@ -6,6 +6,10 @@
   "scripts": {
     "test": "node test/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erkyrath/node-xml-zarf.git"
+  },
   "author": "Andrew Plotkin <erkyrath@eblong.com>",
   "license": "MIT",
   "dependencies": {
