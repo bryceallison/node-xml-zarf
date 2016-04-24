@@ -522,3 +522,69 @@ test('attributes', function(t) {
     });
 });
 
+test('lists of varying structs', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: Object,
+                int: {
+                    _result: v => v.count,
+                    count: Number
+                },
+                text: {
+                    _result: v => v.str,
+                    str: String
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/multilist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: [
+                        { text: 'First' },
+                        { int: 2 },
+                        { text: 'Third' },
+                        { int: 4 }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
+test('lists of varying structs transformed', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                int: {
+                    _result: v => ({ type:'int', val:v.count }),
+                    count: Number
+                },
+                text: {
+                    _result: v => ({ type:'str', val:v.str }),
+                    str: String
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/multilist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: [
+                        { type:'str', val: 'First' },
+                        { type:'int', val: 2 },
+                        { type:'str', val: 'Third' },
+                        { type:'int', val: 4 }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
