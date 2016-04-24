@@ -57,9 +57,20 @@ The parsing is conservative; XML fields not mentioned in the structure are ignor
 
 Note that an object field in the template can be the symbol `String`, the symbol `Number`, or another object. The special field `_list`, if true, means that the child tags form a JS list rather than an object (their tag names are discarded).
 
-If `_list` is the symbol `Object`, the child objects are wrapped so that their tag names remain. That is, in the example above, you'd get
+In a list, if `_wrapitem` is true, the child objects are wrapped so that their tag names remain. That is, in the example above, you'd get
 
 	list: [ {val:'Bar'}, {val:'Baz'} ]
+
+Normal (non-list) objects are wrapped by default. You can unwrap them by setting `_bareobj` true. Only do this for objects with *at most one* child! In the example above, if we add `_bareobj: true` to the `obj` subfield, we would get
+
+	{
+		root: {
+			name: 'Title',
+			count: 23,
+			obj: 'Foo',
+			list: [ 'Bar', 'Baz' ]
+		}
+	}
 
 If you want custom classes or other post-processing, you can add an `_result(o, attr)` function to any object in the template. (The `attr` argument contains the XML attributes from the open tag.) This function can either modify `o` (and return undefined), or return any Javascript value.
 
