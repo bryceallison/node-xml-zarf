@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <list>
+    <text>
+      <str>First</str>
+    </text>
+    <int>
+      <count>2</count>
+    </int>
+    <text>
+      <str>Third</str>
+    </text>
+    <int>
+      <count>4</count>
+    </int>
+  </list>
+</root>
