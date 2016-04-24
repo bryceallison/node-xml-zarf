@@ -124,7 +124,7 @@ function parse(path, struct, cb)
         if (node.result !== undefined) {
             if (context.curnode.struct._list) {
                 var obj;
-                if (context.curnode.struct._list == Object) {
+                if (context.curnode.struct._wrapitem) {
                     obj = {};
                     obj[node.name] = node.result;
                 }
@@ -134,7 +134,12 @@ function parse(path, struct, cb)
                 context.curnode.result.push(obj);
             }
             else if (context.curnode.result !== undefined) {
-                context.curnode.result[node.name] = node.result;
+                if (context.curnode.struct._bareobj) {
+                    context.curnode.result = node.result;
+                }
+                else {
+                    context.curnode.result[node.name] = node.result;
+                }
             }
         }
     });

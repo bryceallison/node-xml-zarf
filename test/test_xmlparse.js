@@ -246,7 +246,8 @@ test('lists', function(t) {
     const struct = {
         root: {
             list: {
-                _list: Object,
+                _list: true,
+                _wrapitem: true,
                 int: Number,
                 string: String
             }
@@ -302,7 +303,8 @@ test('list-items deep', function(t) {
     const struct = {
         root: {
             list: {
-                _list: Object,
+                _list: true,
+                _wrapitem: true,
                 item: {
                     name: String,
                     count: Number
@@ -320,6 +322,36 @@ test('list-items deep', function(t) {
                         { item: { name:'Second' } },
                         { item: { name:'Third' } },
                         { item: { name:'Fourth' } }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
+test('list-items bare', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                item: {
+                    _bareobj: true,
+                    name: String,
+                    count: Number
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/itemlist.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    list: [
+                        4,
+                        'Second',
+                        'Third',
+                        'Fourth'
                     ]
                 }
             });
@@ -358,7 +390,8 @@ test('tree', function(t) {
         root: {
             name: String,
             list: {
-                _list: Object,
+                _list: true,
+                _wrapitem: true,
                 entry: {
                     key: String,
                     value: String
@@ -483,6 +516,34 @@ test('lists transform', function(t) {
     });
 });
 
+test('lists bare', function(t) {
+    const struct = {
+        root: {
+            _bareobj: true,
+            list: {
+                _list: true,
+                _result: ls => { var res = ls.slice(0); res.push('END'); return res },
+                int: Number,
+                string: String
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: [
+                    11,
+                    'Foo',
+                    22,
+                    'Bar',
+                    'END'
+                ]
+            });
+        t.end();
+    });
+});
+
 test('attributes', function(t) {
     const struct = {
         root: {
@@ -526,7 +587,8 @@ test('lists of varying structs', function(t) {
     const struct = {
         root: {
             list: {
-                _list: Object,
+                _list: true,
+                _wrapitem: true,
                 int: {
                     _result: v => v.count,
                     count: Number
