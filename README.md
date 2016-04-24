@@ -8,11 +8,13 @@ I don't plan to publish this to NPM because there must be a thousand packages th
 
 ## Usage
 
+### Parsing
+
 	xmlparse.parse(source, struct, callback);
 
-The source may be a pathname or an instance of `stream.Readable`. The call is always async; the callback has the form `callback(doc, err)` where err is null on success.
+The `source` may be a pathname or an instance of `stream.Readable`. The call is always async; the `callback` has the form `callback(doc, err)`. On success, `err` is null and `doc` is the parsed Javascript data.
 
-The struct template might look like:
+The `struct` argument is a template of Javascript data, structured the way your XML will be. For example, the template might look like:
 
 	const struct = {
 		root: {
@@ -61,4 +63,11 @@ If `_list` is the symbol `Object`, the child objects are wrapped so that their t
 
 If you want custom classes or other post-processing, you can add an `_result(o, attr)` function to any object in the template. (The `attr` argument contains the XML attributes from the open tag.) This function can either modify `o` (and return undefined), or return any Javascript value.
 
+### Writing
+
+	xmlwrite.write(dest, struct, doc, cb)
+
+The `dest` may be a pathname or an instance of `stream.Writable`. The call is always async; the `callback` has the form `callback(err)`, where `err` is null on success.
+
+The `struct` argument is a template of Javascript data, structured the way your XML will be.
 
