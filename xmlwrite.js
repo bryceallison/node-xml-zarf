@@ -87,6 +87,18 @@ function escape_xml_text(str)
     return str;
 }
 
+function array_has_string(arr, atstart)
+{
+    if (!arr || !arr.length)
+        return false;
+    var val;
+    if (atstart)
+        val = arr[0];
+    else
+        val = arr[arr.length-1];
+    return (typeof(val) == 'string');
+}
+
 function thunk(context)
 {
     while (true) {
@@ -204,7 +216,7 @@ function thunk(context)
                     context.outbuf.push('>');
                 }
 
-                if (!(node.struct === String || typeof(node.struct) == 'string')) {
+                if (!(node.struct === String || array_has_string(node.children, true))) {
                     context.outbuf.push('\n');
                 }
             }
@@ -246,8 +258,8 @@ function thunk(context)
                     // pass
                 }
                 else {
-                    if (!(node.struct === String || typeof(node.struct) == 'string')) {
-                        if (context.indent) {
+                    if (context.indent) {
+                        if (!(node.struct === String || array_has_string(node.children, false))) {
                             for (var ix=0; ix<context.depth; ix++)
                                 context.outbuf.push('  ');
                         }
