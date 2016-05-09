@@ -704,3 +704,90 @@ test('lists of varying structs transformed', function(t) {
     });
 });
 
+test('struct _type', function(t) {
+    const struct = {
+        root: {
+            name: String,
+            list: {
+                _list: true,
+                _wrapitem: true,
+                entry: {
+                    _type: {
+                        key: String,
+                        value: String
+                    },
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/tree.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    name: 'Title',
+                    list: [
+                        { 
+                            entry: {
+                                key: 'Color',
+                                value: 'blue'
+                            }
+                        },
+                        { 
+                            entry: {
+                                key: 'Size',
+                                value: 'huge'
+                            }
+                        }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
+test('named _type', function(t) {
+    const struct = {
+        _types: {
+            keyval: {
+                key: String,
+                value: String
+            }
+        },
+        root: {
+            name: String,
+            list: {
+                _list: true,
+                _wrapitem: true,
+                entry: {
+                    _type: 'keyval',
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/tree.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: {
+                    name: 'Title',
+                    list: [
+                        { 
+                            entry: {
+                                key: 'Color',
+                                value: 'blue'
+                            }
+                        },
+                        { 
+                            entry: {
+                                key: 'Size',
+                                value: 'huge'
+                            }
+                        }
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+

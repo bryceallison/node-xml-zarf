@@ -16,7 +16,12 @@ function parse(path, struct, cb)
        must be careful to shut down on the first end or error event
        and ignore later ones. */
 
+    var types = {};
+    if (struct._types)
+        types = struct._types;
+
     var context = {
+        types: types,    // structs for named _type
         rootresult: {},
         depth: 0,
         curnode: null,   // {name, attr, struct, result}
@@ -72,8 +77,21 @@ function parse(path, struct, cb)
 
         if (struct !== undefined) {
             var match = undefined;
-            if (struct !== String && struct !== Number)
-                match = struct[tag.name];
+            if (struct !== String && struct !== Number) {
+                if (struct._type !== undefined) {
+                    if (typeof(struct._type) == 'string') {
+                        var altstruct = context.types[struct._type];
+                        if (altstruct)
+                            match = altstruct[tag.name];
+                    }
+                    else {
+                        match = struct._type[tag.name];
+                    }
+                }
+                else {
+                    match = struct[tag.name];
+                }
+            }
             node.struct = match;
 
             if (match === String || (match && match._type === String)) {
