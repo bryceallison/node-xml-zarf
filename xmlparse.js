@@ -94,12 +94,12 @@ function parse(path, struct, cb)
             }
             node.struct = match;
 
-            if (match === String || (match && match._type === String)) {
+            if (match === String || (match !== undefined && match._type === String)) {
                 node.istext = String;
                 context.text = [];
                 node.result = '';
             }
-            else if (match === Number || (match && match._type === Number)) {
+            else if (match === Number || (match !== undefined && match._type === Number)) {
                 node.istext = Number;
                 context.text = [];
                 node.result = 0;
