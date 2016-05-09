@@ -516,6 +516,60 @@ test('lists transform', function(t) {
     });
 });
 
+test('lists inner _types', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                int: {
+                    _type: Number
+                },
+                string: {
+                    _type: String
+                },
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: [11, 'Foo', 22, 'Bar']
+                }
+            });
+        t.end();
+    });
+});
+
+test('lists inner transform', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                int: {
+                    _type: Number,
+                    _result: val => -val
+                },
+                string: {
+                    _type: String,
+                    _result: val => val.toUpperCase()
+                },
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/lists.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: [-11, 'FOO', -22, 'BAR']
+                }
+            });
+        t.end();
+    });
+});
+
 test('lists bare', function(t) {
     const struct = {
         root: {

@@ -76,11 +76,13 @@ function parse(path, struct, cb)
                 match = struct[tag.name];
             node.struct = match;
 
-            if (match === String) {
+            if (match === String || (match && match._type === String)) {
+                node.istext = String;
                 context.text = [];
                 node.result = '';
             }
-            else if (match === Number) {
+            else if (match === Number || (match && match._type === Number)) {
+                node.istext = Number;
                 context.text = [];
                 node.result = 0;
             }
@@ -103,15 +105,13 @@ function parse(path, struct, cb)
         context.depth -= 1;
 
         var node = context.curnode;
-        if (node.struct === String) {
+        if (node.istext) {
             node.result = context.text.join('');
             context.text = null;
+            if (node.istext === Number)
+                node.result = 1 * node.result;
         }
-        else if (node.struct === Number) {
-            node.result = 1 * context.text.join('');
-            context.text = null;
-        }
-        else if (node.struct !== undefined) {
+        if (node.struct !== undefined && node.struct !== String && node.struct !== Number) {
             if (node.struct._result !== undefined) {
                 var res = node.struct._result(node.result, node.attr);
                 if (res !== undefined)
