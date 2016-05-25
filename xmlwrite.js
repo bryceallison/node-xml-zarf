@@ -313,3 +313,4 @@ function WriteStringBuffer()
 }
 
 exports.write = write;
+exports.writestring = writestring;
