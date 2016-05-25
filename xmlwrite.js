@@ -290,6 +290,7 @@ function thunk(context)
 function WriteStringBuffer()
 {
     const BUFSIZE = 1024;
+    const buffer_mod = require('buffer');
 
     var buffer = new buffer_mod.Buffer(BUFSIZE);
     var bufpos = 0;
