@@ -45,6 +45,17 @@ function write(path, struct, doc, cb)
     thunk(context);
 }
 
+function writestring(struct, doc, cb)
+{
+    var stream = WriteStringBuffer();
+    write(stream, struct, doc, ex => {
+        if (ex)
+            cb(null, ex);
+        else
+            cb(stream._result(), null);
+    });
+}
+
 function TagNode(tagname, struct, doc, parent)
 {
     this.phase = PH_INIT;
@@ -274,6 +285,31 @@ function thunk(context)
         }
 
     }
+}
+
+function WriteStringBuffer()
+{
+    const BUFSIZE = 1024;
+
+    var buffer = new buffer_mod.Buffer(BUFSIZE);
+    var bufpos = 0;
+
+    var stream = new stream_mod.Writable({
+            write: function(chunk, encoding, cb) {
+                if (bufpos + chunk.length > buffer.length) {
+                    var newbuf = new buffer_mod.Buffer(bufpos + chunk.length + BUFSIZE);
+                    buffer.copy(newbuf, 0, 0, bufpos);
+                    buffer = newbuf;
+                }
+                chunk.copy(buffer, bufpos, 0, chunk.length);
+                bufpos += chunk.length;
+                cb();
+            }
+        });
+
+    stream._resultbuffer = function() { return buffer; };
+    stream._result = function() { return buffer.toString('utf8', 0, bufpos); };
+    return stream;
 }
 
 exports.write = write;
