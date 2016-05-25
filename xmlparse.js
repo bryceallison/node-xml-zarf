@@ -180,7 +180,7 @@ function parse(path, struct, cb)
 function parsestring(str, struct, cb)
 {
     var readstream = ReadStringBuffer(str);
-    xmlparse.parse(readstream, struct, cb);
+    parse(readstream, struct, cb);
 }
 
 function ReadStringBuffer(str)
