@@ -177,4 +177,35 @@ function parse(path, struct, cb)
     var pipe = readstream.pipe(parsestream);
 }
 
+function parsestring(str, struct, cb)
+{
+    var readstream = ReadStringBuffer(str);
+    xmlparse.parse(readstream, struct, cb);
+}
+
+function ReadStringBuffer(str)
+{
+    var buffer = new buffer_mod.Buffer(str);
+    var consumed = false;
+
+    var stream = new stream_mod.Readable({
+            read: function(size) {
+                while (true) {
+                    if (!consumed) {
+                        var more = this.push(buffer);
+                        consumed = true;
+                        if (!more)
+                            return;
+                        continue;
+                    }
+                    this.push(null);
+                    return;
+                }
+            }
+        });
+
+    return stream;
+}
+
 exports.parse = parse;
+exports.parsestring = parsestring;
