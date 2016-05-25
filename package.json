@@ -1,6 +1,6 @@
 {
   "name": "node-xml-zarf",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Parse XML into JS data structures and back",
   "main": "main.js",
   "scripts": {
