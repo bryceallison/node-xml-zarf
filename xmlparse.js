@@ -185,6 +185,7 @@ function parsestring(str, struct, cb)
 
 function ReadStringBuffer(str)
 {
+    const buffer_mod = require('buffer');
     var buffer = new buffer_mod.Buffer(str);
     var consumed = false;
 
