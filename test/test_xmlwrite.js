@@ -68,8 +68,9 @@ test('twostrings simple', function(t) {
 test('twostrings fancy', function(t) {
     const struct = {
         root: {
-            _order: [ 'first', 'second', 'third' ],
+            _order: [ 'first', 'firster', 'second', 'third' ],
             first: String,
+            firster: String,
             second: String,
             third: String
         }
@@ -78,6 +79,7 @@ test('twostrings fancy', function(t) {
     const doc = {
         root: {
             first: '<em>Foo&amp;',
+            firster: '<p><em>Foo</em>&amp;&lt;&lt;</p>',
             second: 'A\u00E5/\u03A3/\u201C\u201D.',
             third: 1234
         }
@@ -86,6 +88,7 @@ test('twostrings fancy', function(t) {
     const wanted = `<?xml version="1.0" encoding="UTF-8"?>
   <root>
     <first>&lt;em&gt;Foo&amp;amp;</first>
+    <firster>&lt;p&gt;&lt;em&gt;Foo&lt;/em&gt;&amp;amp;&amp;lt;&amp;lt;&lt;/p&gt;</firster>
     <second>A\u00E5/\u03A3/\u201C\u201D.</second>
     <third>1234</third>
   </root>
