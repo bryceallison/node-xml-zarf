@@ -4,6 +4,8 @@ const fs = require('fs');
 const stream_mod = require('stream');
 const sax = require('sax');
 
+const UserTag = require('./usertag.js').UserTag;
+
 function parse(path, struct, cb)
 {
     var parsestream = sax.createStream(true, {});
@@ -26,6 +28,7 @@ function parse(path, struct, cb)
         depth: 0,
         curnode: null,   // {name, attr, struct, result}
         text: null,      // active if curnode is String
+        tagstack: null,  // active if curnode is UserTag
         selferror: null, // set if we generate an error
         done: false      // set on EOF or first error
     };
@@ -67,6 +70,17 @@ function parse(path, struct, cb)
         if (context.done)
             return;
 
+        if (context.tagstack !== null) {
+            var str = context.text.join('');
+            context.text = [];
+            if (str.length) {
+                context.tagstack[context.tagstack.length-1].children.push(str);
+            }
+            var newtag = new UserTag(tag.name, []);
+            context.tagstack.push(newtag);
+            return;
+        }
+
         var struct = context.curnode.struct;
 
         var node = {
@@ -104,6 +118,12 @@ function parse(path, struct, cb)
                 context.text = [];
                 node.result = 0;
             }
+            else if (match === UserTag || (match !== undefined && match._type === UserTag)) {
+                node.istext = UserTag;
+                context.text = [];
+                context.tagstack = [ new UserTag(tag.name, []) ];
+                node.result = null;
+            }
             else if (match !== undefined) {
                 if (match._list)
                     node.result = [];
@@ -123,7 +143,22 @@ function parse(path, struct, cb)
         context.depth -= 1;
 
         var node = context.curnode;
-        if (node.istext) {
+        if (node.istext === UserTag) {
+            var str = context.text.join('');
+            context.text = [];
+            var tag = context.tagstack.pop();
+            if (str.length)
+                tag.children.push(str);
+            if (context.tagstack.length) {
+                context.depth += 1;
+                context.tagstack[context.tagstack.length-1].children.push(tag);
+                return;
+            }
+            node.result = tag;
+            context.text = null;
+            context.tagstack = null;
+        }
+        else if (node.istext) {
             node.result = context.text.join('');
             context.text = null;
             if (node.istext === Number)

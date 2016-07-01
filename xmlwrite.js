@@ -3,6 +3,8 @@
 const fs = require('fs');
 const stream_mod = require('stream');
 
+const UserTag = require('./usertag.js').UserTag;
+
 const PH_INIT = 0;
 const PH_OPEN = 1;
 const PH_CHILDREN = 2;
@@ -67,20 +69,6 @@ function TagNode(tagname, struct, doc, parent)
     this.children = null;
     this.index = null;
     this.tag = ((tagname, children) => new UserTag(tagname, children));
-}
-
-function UserTag(tagname, children)
-{
-    if (Array.isArray(tagname)) {
-        children = tagname;
-        tagname = undefined;
-    }
-    if (typeof(children) == 'string') {
-        children = [ children ];
-    }
-
-    this.tagname = tagname;
-    this.children = children;
 }
 
 function escape_xml_text(str)
