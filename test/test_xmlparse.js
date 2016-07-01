@@ -4,6 +4,10 @@ const buffer_mod = require('buffer');
 const test = require('tape').test;
 const xmlparse = require('../xmlparse.js');
 
+const usertag_mod = require('../usertag.js');
+const UserTag = usertag_mod.UserTag;
+const tagequal = usertag_mod.tagequal;
+
 function ReadStringBuffer(str)
 {
     var buffer = new buffer_mod.Buffer(str);
@@ -791,3 +795,78 @@ test('named _type', function(t) {
     });
 });
 
+test('tag soup 1', function(t) {
+    const struct = {
+        root: UserTag
+    };
+
+    xmlparse.parse('test/files/soup.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.assert(tagequal(res.root,
+            new UserTag('root', [ 
+                new UserTag('head', [
+                    new UserTag('first', 'First'),
+                    new UserTag('second', 'Second'),
+                ]),
+                new UserTag('body', [
+                    new UserTag('third', 'Third'),
+                    new UserTag('fourth', 'Fourth'),
+                ]),
+            ])
+        ), 'tagequal');
+        t.end();
+    });
+});
+
+test('tag soup 2', function(t) {
+    const struct = {
+        root: {
+            head: {
+                first: String,
+                second: String,
+            },
+            body: UserTag
+        }
+    };
+
+    xmlparse.parse('test/files/soup.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res.root.head,
+            { first:'First', second:'Second' }
+        );
+        t.assert(tagequal(res.root.body,
+            new UserTag('body', [
+                new UserTag('third', 'Third'),
+                new UserTag('fourth', 'Fourth'),
+            ])
+        ), 'tagequal');
+        t.end();
+    });
+});
+
+test('tag soup 3', function(t) {
+    const struct = {
+        root: {
+            head: UserTag,
+            body: {
+                third: String,
+                fourth: String,
+                alsonot: { }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/soup.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.assert(tagequal(res.root.head,
+            new UserTag('head', [
+                new UserTag('first', 'First'),
+                new UserTag('second', 'Second'),
+            ])
+        ), 'tagequal');
+        t.deepEqual(res.root.body,
+            { third:'Third', fourth:'Fourth' }
+        );
+        t.end();
+    });
+});
