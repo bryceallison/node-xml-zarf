@@ -870,3 +870,29 @@ test('tag soup 3', function(t) {
         t.end();
     });
 });
+
+test('tag soup with text', function(t) {
+    const struct = {
+        root: UserTag
+    };
+
+    xmlparse.parse('test/files/souptext.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.assert(tagequal(res.root,
+            new UserTag('root', [ 
+                new UserTag('p', [
+                    'Text-',
+                    new UserTag('em', ['italic']),
+                    '-end.',
+                ]),
+                'NL',
+                new UserTag('p', [
+                    'More.',
+                ]),
+                'NL2',
+            ])
+        ), 'tagequal');
+        t.end();
+    });
+});
+
