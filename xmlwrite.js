@@ -116,7 +116,7 @@ function thunk(context)
         }
 
         if (node.phase == PH_INIT) {
-            if (typeof(node.struct) == 'function') {
+            if (typeof(node.struct) == 'function' && node.struct !== UserTag) {
                 node.struct = node.struct(node.doc, node);
             }
 
@@ -134,6 +134,23 @@ function thunk(context)
             }
             else if (typeof(struct) == 'string') {
                 node.children = [ struct ];
+            }
+            else if (struct === UserTag) {
+                var tag = node.doc;
+                if (tag.tagname)
+                    node.tagname = tag.tagname;
+                if (tag.children) {
+                    node.children = [];
+                    for (var ix=0; ix<tag.children.length; ix++) {
+                        var child = tag.children[ix];
+                        var newnode;
+                        if (typeof(child) == 'string')
+                            newnode = child;
+                        else
+                            newnode = new TagNode('#noname#', child, '#nodoc#', node);
+                        node.children.push(newnode);
+                    }
+                }
             }
             else if (struct instanceof UserTag) {
                 if (struct.tagname)
