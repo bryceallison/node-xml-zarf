@@ -68,7 +68,9 @@ function TagNode(tagname, struct, doc, parent)
     this.origstruct = struct;
     this.children = null;
     this.index = null;
+    this.suppressindent = false;
     this.tag = ((tagname, children) => new UserTag(tagname, children));
+    this.noindent = (() => { this.suppressindent = true; });
 }
 
 function escape_xml_text(str)
@@ -206,6 +208,11 @@ function thunk(context)
                 }
             }
 
+            if (node.suppressindent) {
+                node.stashindent = context.indent;
+                context.indent = false;
+            }
+
             node.phase++;
             continue;
         }
@@ -282,6 +289,10 @@ function thunk(context)
                     }
                     context.outbuf.push('</', node.tagname, '>\n');
                 }
+            }
+
+            if (node.suppressindent) {
+                context.indent = node.stashindent;
             }
 
             context.node = node.parent;
