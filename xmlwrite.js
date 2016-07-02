@@ -239,8 +239,10 @@ function thunk(context)
                     context.outbuf.push('>');
                 }
 
-                if (!(node.struct === String || array_has_string(node.children, true))) {
-                    context.outbuf.push('\n');
+                if (context.indent) {
+                    if (!(node.struct === String || array_has_string(node.children, true))) {
+                        context.outbuf.push('\n');
+                    }
                 }
             }
 
@@ -287,7 +289,10 @@ function thunk(context)
                                 context.outbuf.push('  ');
                         }
                     }
-                    context.outbuf.push('</', node.tagname, '>\n');
+                    context.outbuf.push('</', node.tagname, '>');
+                    if (context.indent) {
+                        context.outbuf.push('\n');
+                    }
                 }
             }
 
