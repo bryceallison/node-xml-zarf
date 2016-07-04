@@ -334,5 +334,42 @@ function WriteStringBuffer()
     return stream;
 }
 
+function usertag_to_string_int(tag, arr)
+{
+    if (!tag)
+        return;
+
+    if (typeof(tag) == 'string') {
+        arr.push(escape_xml_text(tag));
+        return;
+    }
+
+    arr.push('<'+tag.tagname+'>');
+
+    if (tag.children && tag.children.length) {
+        for (var subtag of tag.children)
+            usertag_to_string_int(subtag, arr);
+    }
+
+    arr.push('</'+tag.tagname+'>');
+}
+
+function fastwritestring(tag)
+{
+    var arr = [];
+
+    if (tag instanceof UserTag) {
+        usertag_to_string_int(tag, arr);
+    }
+    else if (Array.isArray(tag)) {
+        for (var subtag of tag)
+            usertag_to_string_int(subtag, arr);
+    }
+    
+    return arr.join('');
+}
+
+
 exports.write = write;
 exports.writestring = writestring;
+exports.fastwritestring = fastwritestring;
