@@ -66,6 +66,7 @@ function TagNode(tagname, struct, doc, parent)
     this.doc = doc;
     this.struct = struct;
     this.origstruct = struct;
+    this.attrs = null;
     this.children = null;
     this.index = null;
     this.suppressindent = false;
@@ -85,6 +86,22 @@ function escape_xml_text(str)
     str = str.replace(/&/g, '&amp;');
     str = str.replace(/</g, '&lt;');
     str = str.replace(/>/g, '&gt;');
+    return str;
+}
+
+function escape_xml_qtext(str)
+{
+    if (typeof(str) != 'string')
+        str = '' + str;
+
+    var match = str.match(/[><&""]/);
+    if (match == null)
+        return str;
+    
+    str = str.replace(/&/g, '&amp;');
+    str = str.replace(/</g, '&lt;');
+    str = str.replace(/>/g, '&gt;');
+    str = str.replace(/[""]/g, '&quot;');
     return str;
 }
 
@@ -180,7 +197,18 @@ function thunk(context)
                     node.children.push(newnode);
                 }
             }
-            else { 
+            else {
+                if (struct._attrs !== undefined) {
+                    if (Array.isArray(struct._attrs)) {
+                        node.attrs = struct._attrs;
+                    }
+                    else {
+                        node.attrs = [];
+                        for (var key in struct._attrs)
+                            node.attrs.push({ key:key, val:struct._attrs[key] });
+                    }
+                }
+
                 var order;
                 if (struct._order !== undefined) {
                     order = struct._order;
@@ -231,6 +259,14 @@ function thunk(context)
                 }
                     
                 context.outbuf.push('<', node.tagname);
+
+                if (node.attrs) {
+                    for (var pair of node.attrs) {
+                        context.outbuf.push(' ', pair.key, '="');
+                        context.outbuf.push(escape_xml_qtext(pair.val));
+                        context.outbuf.push('"');
+                    }
+                }
                 
                 if (!node.children || !node.children.length) {
                     context.outbuf.push('/>');
