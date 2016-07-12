@@ -421,3 +421,67 @@ test('error on undefined', function(t) {
     });
 });
 
+
+test('attributes', function(t) {
+    const struct = {
+        root: {
+            _attrs: { version:'123.4' },
+            _order: [ 'first', 'second' ],
+            first: String,
+            second: {
+                _attrs: [ { key:'kk', val:'vv' } ],
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            first: 'Hello',
+            second: true
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root version="123.4">
+    <first>Hello</first>
+    <second kk="vv"/>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
+test('attributes escaped', function(t) {
+    const struct = {
+        root: {
+            _attrs: { version:'z<i>&amp;</i> "Hi."' },
+            _order: [ 'first' ],
+            first: String
+        }
+    };
+
+    const doc = {
+        root: {
+            first: 'Hello'
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root version="z&lt;i&gt;&amp;amp;&lt;/i&gt; &quot;Hi.&quot;">
+    <first>Hello</first>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
