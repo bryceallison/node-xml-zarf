@@ -915,3 +915,45 @@ test('tag soup with attributes', function(t) {
     });
 });
 
+test('tag soup with attributes 2', function(t) {
+    const struct = {
+        root: UserTag
+    };
+
+    xmlparse.parse('test/files/soupattr2.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.assert(tagequal(res.root,
+            new UserTag('root', { version:'3' }, [ 
+                new UserTag('head', { class:'header' }, [
+                    new UserTag('first', 'First'),
+                    new UserTag('second', 'Second'),
+                ]),
+            ])
+        ), 'tagequal');
+        t.end();
+    });
+});
+
+test('tag soup with attributes 3', function(t) {
+    const struct = {
+        root: {
+            _result: (o, attr) => {
+                o.version = attr.version;
+            },
+            head: UserTag
+        }
+    };
+
+    xmlparse.parse('test/files/soupattr2.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.equal(res.root.version, '3');
+        t.assert(tagequal(res.root.head,
+                new UserTag('head', { class:'header' }, [
+                    new UserTag('first', 'First'),
+                    new UserTag('second', 'Second'),
+                ])
+        ), 'tagequal');
+        t.end();
+    });
+});
+
