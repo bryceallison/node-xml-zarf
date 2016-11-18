@@ -76,7 +76,7 @@ function parse(path, struct, cb)
             if (str.length) {
                 context.tagstack[context.tagstack.length-1].children.push(str);
             }
-            var newtag = new UserTag(tag.name, []);
+            var newtag = new UserTag(tag.name, tag.attributes, []);
             context.tagstack.push(newtag);
             return;
         }
@@ -121,7 +121,7 @@ function parse(path, struct, cb)
             else if (match === UserTag || (match !== undefined && match._type === UserTag)) {
                 node.istext = UserTag;
                 context.text = [];
-                context.tagstack = [ new UserTag(tag.name, []) ];
+                context.tagstack = [ new UserTag(tag.name, tag.attributes, []) ];
                 node.result = null;
             }
             else if (match !== undefined) {

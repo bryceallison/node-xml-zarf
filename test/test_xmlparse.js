@@ -896,3 +896,22 @@ test('tag soup with text', function(t) {
     });
 });
 
+test('tag soup with attributes', function(t) {
+    const struct = {
+        root: UserTag
+    };
+
+    xmlparse.parse('test/files/soupattr.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.assert(tagequal(res.root,
+            new UserTag('root', { version:'2' }, [ 
+                new UserTag('head', [
+                    new UserTag('first', { class:'foo' }, 'First'),
+                    new UserTag('second', [{ key:'class', val:'bar' }], 'Second'),
+                ]),
+            ])
+        ), 'tagequal');
+        t.end();
+    });
+});
+
