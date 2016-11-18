@@ -456,6 +456,41 @@ test('attributes', function(t) {
     });
 });
 
+test('list of attributes', function(t) {
+    const struct = {
+        root: {
+            _attrs: [ { key:'version', val:'123.4' }, {  key:'format', val:'nonesuch' } ],
+            _order: [ 'second' ],
+            second: {
+                _attrs: [
+                    { key:'k1', val:'vv1' },
+                    { key:'k2', val:'vv2' },
+                    { key:'k3', val:'vv3' },
+                ],
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            second: true
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root version="123.4" format="nonesuch">
+    <second k1="vv1" k2="vv2" k3="vv3"/>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
 test('attributes escaped', function(t) {
     const struct = {
         root: {
