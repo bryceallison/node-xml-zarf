@@ -4,6 +4,10 @@ const buffer_mod = require('buffer');
 const test = require('tape').test;
 const xmlwrite = require('../xmlwrite.js');
 
+const usertag_mod = require('../usertag.js');
+const UserTag = usertag_mod.UserTag;
+const tagequal = usertag_mod.tagequal;
+
 function WriteStringBuffer()
 {
     const BUFSIZE = 1024;
@@ -552,6 +556,82 @@ test('attributes escaped', function(t) {
     const wanted = `<?xml version="1.0" encoding="UTF-8"?>
   <root version="z&lt;i&gt;&amp;amp;&lt;/i&gt; &quot;Hi.&quot;">
     <first>Hello</first>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
+test('usertag', function(t) {
+    const struct = {
+        root: {
+            _order: [ 'body' ],
+            body: UserTag
+        }
+    };
+
+    const doc = {
+        root: {
+            body: new UserTag('body', [
+                new UserTag('zeroth'),
+                new UserTag('first', {src:'foo'}),
+                new UserTag('second', 'secondtext'),
+                new UserTag('third', [{key:'one',val:'11'}, {key:'two',val:'22'}, {key:'three',val:'33'}], ['xx']),
+            ])
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <body>
+      <zeroth/>
+      <first src="foo"/>
+      <second>secondtext</second>
+      <third one="11" two="22" three="33">xx</third>
+    </body>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
+test('usertag relayed', function(t) {
+    const struct = {
+        root: {
+            _order: [ 'body' ],
+            body: (val, node) => val,
+        }
+    };
+
+    const doc = {
+        root: {
+            body: new UserTag('body', [
+                new UserTag('zeroth'),
+                new UserTag('first', {src:'foo'}),
+                new UserTag('second', 'secondtext'),
+                new UserTag('third', [{key:'one',val:'11'}, {key:'two',val:'22'}, {key:'three',val:'33'}], ['xx']),
+            ])
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <body>
+      <zeroth/>
+      <first src="foo"/>
+      <second>secondtext</second>
+      <third one="11" two="22" three="33">xx</third>
+    </body>
   </root>
 `;
 
