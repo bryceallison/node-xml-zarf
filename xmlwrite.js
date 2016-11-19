@@ -70,7 +70,10 @@ function TagNode(tagname, struct, doc, parent)
     this.children = null;
     this.index = null;
     this.suppressindent = false;
-    this.tag = ((tagname, children) => new UserTag(tagname, children));
+
+    /* And a couple of methods. The idiom to pass the arguments list over
+       to a constructor is slightly messy. */
+    this.tag = (function() { return new UserTag(...arguments); });
     this.noindent = (() => { this.suppressindent = true; });
 }
 
