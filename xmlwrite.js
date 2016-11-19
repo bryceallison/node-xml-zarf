@@ -177,6 +177,9 @@ function thunk(context)
             else if (struct instanceof UserTag) {
                 if (struct.tagname)
                     node.tagname = struct.tagname;
+                if (struct.attrlist.length) {
+                    node.attrs = struct.attrlist;
+                }
                 if (struct.children) {
                     node.children = [];
                     for (var ix=0; ix<struct.children.length; ix++) {

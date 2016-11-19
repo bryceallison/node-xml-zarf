@@ -398,6 +398,49 @@ test('tag nullability', function(t) {
     });
 });
 
+test('tag variations', function(t) {
+    const struct = {
+        root: {
+            _order: [ 
+                'zeroth', 'first', 'second',
+                'third', 'fourth',
+            ],
+            zeroth: (val, node) => node.tag(['xx', 'yy']),
+            first: (val, node) => node.tag('first', {cla:'head'}),
+            second: (val, node) => node.tag('second', {vers:'foo'}, 'value'),
+            third: (val, node) => node.tag('third', [{key:'xx',val:'yyy'}], null),
+            fourth: (val, node) => node.tag('fourth', [{key:'one',val:'11'}, {key:'two',val:'22'}, {key:'three',val:'33'}], [val]),
+        }
+    };
+
+    const doc = {
+        root: {
+            zeroth: true,
+            first: true,
+            second: true,
+            third: true,
+            fourth: 'fourthtext',
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <zeroth>xxyy</zeroth>
+    <first cla="head"/>
+    <second vers="foo">value</second>
+    <third xx="yyy"/>
+    <fourth one="11" two="22" three="33">fourthtext</fourth>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
 test('error on undefined', function(t) {
     const struct = {
         root: {
