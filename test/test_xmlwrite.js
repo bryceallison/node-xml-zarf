@@ -3,6 +3,7 @@ const buffer_mod = require('buffer');
 
 const test = require('tape').test;
 const xmlwrite = require('../xmlwrite.js');
+const fastwritestring = xmlwrite.fastwritestring;
 
 const usertag_mod = require('../usertag.js');
 const UserTag = usertag_mod.UserTag;
@@ -37,6 +38,43 @@ function stripwhite(str)
 {
     return str.replace(/\s+/g, '');
 }
+
+test('fastwritestring', function(t) {
+        t.equal(fastwritestring(
+                new UserTag('foo')
+            ), 
+            '<foo></foo>');
+
+        t.equal(
+            stripwhite(fastwritestring(
+                new UserTag('root', [
+                    new UserTag('head'),
+                    new UserTag('body', 'stuff')
+                ])
+                )), 
+            stripwhite(`
+<root>
+  <head></head>
+  <body>stuff</body>
+</root>
+            `));
+
+        t.equal(
+            stripwhite(fastwritestring(
+                new UserTag('root', {version:'one'}, [
+                    new UserTag('head', {length:'long'}),
+                    new UserTag('body', [{key:'first',val:'one'}, {key:'second',val:'two'}], 'stuff')
+                ])
+                )), 
+            stripwhite(`
+<root version="one">
+  <head length="long"></head>
+  <body first="one" second="two">stuff</body>
+</root>
+            `));
+
+        t.end();
+});
 
 test('twostrings simple', function(t) {
     const struct = {

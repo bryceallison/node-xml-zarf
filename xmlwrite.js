@@ -386,7 +386,18 @@ function usertag_to_string_int(tag, arr)
         return;
     }
 
-    arr.push('<'+tag.tagname+'>');
+    if (!tag.attrlist || !tag.attrlist.length) {
+        arr.push('<'+tag.tagname+'>');
+    }
+    else {
+        arr.push('<'+tag.tagname);
+        for (var pair of tag.attrlist) {
+            arr.push(' ', pair.key, '="');
+            arr.push(escape_xml_qtext(pair.val));
+            arr.push('"');
+        }
+        arr.push('>');
+    }
 
     if (tag.children && tag.children.length) {
         for (var subtag of tag.children)
