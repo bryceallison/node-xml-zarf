@@ -708,6 +708,46 @@ test('lists of varying structs transformed', function(t) {
     });
 });
 
+test('lists within a field', function(t) {
+    const struct = {
+        root: {
+            list: {
+                _list: true,
+                tag: {
+                    _list: true,
+                    _wrapitem: true,
+                    _result: ls => {
+                        var res = { key:null, value:[] };
+                        for (val of ls) {
+                            if (val.key)
+                                res.key = val.key;
+                            else if (val.value)
+                                res.value.push(val.value);
+                        }
+                        return res;
+                    },
+                    key: String,
+                    value: String
+                }
+            }
+        }
+    };
+
+    xmlparse.parse('test/files/multival.xml', struct, (res, ex) => {
+        t.equal(ex, null);
+        t.deepEqual(res, { 
+                root: { 
+                    list: [
+                        { key:'key0', value:[] },
+                        { key:'key1', value:['foo'] },
+                        { key:'key2', value:['foo','bar'] },
+                    ]
+                }
+            });
+        t.end();
+    });
+});
+
 test('struct _type', function(t) {
     const struct = {
         root: {
