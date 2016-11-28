@@ -60,6 +60,9 @@ function writestring(struct, doc, cb)
 
 function TagNode(tagname, struct, doc, parent)
 {
+    if (struct._transform !== undefined)
+        doc = struct._transform(doc);
+
     this.phase = PH_INIT;
     this.parent = parent;
     this.tagname = tagname;

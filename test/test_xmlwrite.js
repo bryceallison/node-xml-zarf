@@ -681,3 +681,94 @@ test('usertag relayed', function(t) {
     });
 });
 
+test('obj transform', function(t) {
+    const struct = {
+        root: {
+            _order: [ 'label', 'thing' ],
+            _transform: val => {
+                return {
+                    label: val.label+'!',
+                    thing: { first:val.first, second:val.second },
+                };
+            },
+            label: String,
+            thing: {
+                first: String,
+                second: String
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            label: 'Hello',
+            first:'one',
+            second:'two',
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <label>Hello!</label>
+    <thing>
+      <first>one</first>
+      <second>two</second>
+    </thing>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
+test('listitems transform', function(t) {
+    const struct = {
+        root: {
+            variables: {
+                _list: 'variable',
+                variable: {
+                    _order: [ 'name', 'type' ],
+                    _transform: val => ({ name:val.type, type:val.name }),
+                    name: String,
+                    type: String
+                }
+            }
+        }
+    };
+
+    const doc = {
+        root: {
+            variables: [
+                { name: 'count', type: 'int' },
+                { name: 'size', type: 'float' }
+            ]
+        }
+    };
+
+    const wanted = `<?xml version="1.0" encoding="UTF-8"?>
+  <root>
+    <variables>
+      <variable>
+        <name>int</name>
+        <type>count</type>
+      </variable>
+      <variable>
+        <name>float</name>
+        <type>size</type>
+      </variable>
+    </variables>
+  </root>
+`;
+
+    var stream = WriteStringBuffer();
+    xmlwrite.write(stream, struct, doc, ex => {
+        t.equal(ex, null);
+        t.equal(stripwhite(stream._result()), stripwhite(wanted));
+        t.end();
+    });
+});
+
