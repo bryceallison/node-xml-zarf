@@ -4,7 +4,7 @@ It parses XML into Javascript data structures (in memory), according to a custom
 
 [SAX]: https://github.com/isaacs/sax-js/
 
-I don't plan to publish this to NPM because there must be a thousand packages that do this and mine isn't particularly clever. It does what I want and I might use it again someday.
+I published this to NPM even though there must be a thousand packages that do this and mine isn't particularly clever. It does what I want and I might use it again someday.
 
 ## Usage
 
