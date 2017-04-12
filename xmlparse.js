@@ -130,6 +130,9 @@ function parse(path, struct, cb)
                 else
                     node.result = {};
             }
+            if(match && match._text !== undefined) {
+                context.text = [];
+            }
         }
 
         context.curnode = node;
@@ -167,10 +170,15 @@ function parse(path, struct, cb)
         if (node.struct !== undefined && node.struct !== String && node.struct !== Number) {
             if (node.struct._result !== undefined) {
                 var res = node.struct._result(node.result, node.attr);
+                if(res !== undefined && node.struct._text !== undefined) {
+                    var str = context.text.join('');
+                    res[node.struct._text] = str;
+                }
                 if (res !== undefined)
                     node.result = res;
             }
         }
+
 
         context.curnode = node.parent;
 
@@ -198,6 +206,7 @@ function parse(path, struct, cb)
     });
 
     parsestream.on('text', function(val) {
+        
         if (context.done)
             return;
         if (context.text !== null)

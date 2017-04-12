@@ -608,7 +608,13 @@ test('attributes', function(t) {
             _result: (o, attr) => {
                 o.version = attr.version;
             },
-            thing: String,
+            thing: {
+                _text: 'text',
+                _result: (o, attr) => {
+                    o.foo = attr.foo
+                    return o;
+                }
+            },
             list: {
                 _list: true,
                 item: {
@@ -629,7 +635,10 @@ test('attributes', function(t) {
         t.deepEqual(res, { 
                 root: {
                     version: '1.0',
-                    thing: 'A thing.',
+                    thing: {
+                        text: 'A thing.',
+                        foo: 'footext'
+                    },
                     list: [
                         [ 1, { name:'First' } ],
                         [ 11, { name:'Second' } ],
